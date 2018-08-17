@@ -1,0 +1,9 @@
+{% extends "comun.html" %}
+{% load static %}
+{% block titulo %}Error - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+<div class="container">
+	<h5 class="text-danger">ERROR: No puede acceder a esta página sin establecer los parámetros del sistema.</h5>
+	<a href="{% url 'parametros' %}"><button class="btn btn-sm btn-primary">Configurar</button></a>
+</div>
+{% endblock cuerpo %}

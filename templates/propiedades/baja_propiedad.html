@@ -1,0 +1,13 @@
+{% extends "comun.html" %}
+{% block titulo %}Baja de propiedad - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+	<div class="container">
+		<div class="row"><h2>Baja de propiedad</h2></div>
+		<div class="row">¿Desea dar de baja la propiedad {{ propiedad.direccion }}?</div>
+		<small>Los datos de la propiedad no se eliminarán del sistema.</small>
+		<form method="POST">
+			{% csrf_token %}
+			<button type="submit" class="btn btn-danger">Dar de baja</button>
+		</form>
+	</div>
+{% endblock cuerpo %}

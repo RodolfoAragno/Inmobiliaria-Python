@@ -1,0 +1,71 @@
+{% extends "comun.html" %}
+{% block titulo %}Alta inquilino - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+	<div class="container">
+			{% if persona.dni is None %}
+			<h2>Ingresar el DNI del inquilino</h2>
+			<form id="busqueda_form">
+				<div class="form-group">
+					<label for="busqueda_dni">DNI</label>
+					<input type="text" class="form-control" id="busqueda_dni" placeholder="DNI" required>
+				</div>
+				<button type="submit" class="btn btn-primary">Buscar</button>
+			</form>
+			{% else %}
+			<form class="container" method="POST" id="cargar_form">
+				{% csrf_token %}
+				<div class="form-row">
+					<div class="form-group col-md-4">
+						<label for="dni">DNI</label>
+						<input type="text" class="form-control" name="dni" value="{{persona.dni}}" {% if persona.dni  %} readonly {% endif %}>
+					</div>
+					<div class="form-group col-md-4">
+						<label for="apellido">Apellido</label>
+						<input type="text" class="form-control" name="apellido" required>
+					</div>
+					<div class="form-group col-md-4">
+						<label for="nombre">Nombre</label>
+						<input type="text" class="form-control" name="nombre" required>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="form-group col-md-5">
+						<label for="email">Email
+							<small>(Opcional)</small>
+						</label>
+						<input type="email" class="form-control" name="email">
+					</div>
+					<div class="form-group col-md-5">
+						<label for="telefono">Teléfono
+							<small>(Opcional)</small>
+						</label>
+						<input type="text" class="form-control" name="telefono">
+					</div>
+					<div class="form-group col-md-2">
+						<label for="nacionalidad">Nacionalidad</label>
+						<input type="text" class="form-control" name="nacionalidad" value="Argentino/a">
+					</div>
+				</div>
+				<div class="row justify-content-between">
+					<div class="col-auto"><button type="submit" class="btn btn-primary">Guardar</button></div>
+					<div class="col-auto"><a href="{% url 'listado_inquilinos'%}"><button type="button" class="btn btn-danger">Descartar</button></a></div>
+				</div>
+			</form>
+		</div>
+		{% endif %}
+{% endblock cuerpo %}
+{% block javascript %}
+<script>
+	{% if error %}
+	alert("{{error}}")
+	{% endif %}
+	$('#busqueda_form').submit(function(event){
+		event.preventDefault();
+		if( $('#busqueda_dni').val() != "") {
+			var url = "{% url 'cargar_inquilino' %}/" + $('#busqueda_dni').val()
+			window.location = url
+			return;
+		}
+	})
+</script>
+{% endblock javascript %}

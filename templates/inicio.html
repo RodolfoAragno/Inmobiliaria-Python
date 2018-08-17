@@ -1,0 +1,91 @@
+{% extends "comun.html" %}
+{% load static %}
+{% block titulo %}Inicio - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+{% if parametros_no_seteados %}
+<div class="container">
+	<div class="alert alert-danger" role="alert">
+		No se han establecido los parámetros del sistema. No podrá realizar algunas acciones.
+	</div>
+</div>
+{% endif %}
+<div class="container-fluid">
+	<div class="row justify-content-center pt-2">
+		<div class="card col-md-2 mr-3 text-center shadow-lg p-3">
+			<img class="card-img-top" src="{% static "img/inicio/contratos.svg" %}" height="80px">
+			<div class="card-body">
+				<h5 class="card-title">Administración</h5>
+				<a href="{% url 'listado_contratos' %}"><button class="btn btn-sm btn-primary">Contratos</button></a>
+				<a href="{% url 'cargar_contrato' %}"><button class="btn btn-sm btn-info">Cargar contrato</button></a>
+			</div>
+		</div>
+		<div class="card col-md-2 mr-3 text-center shadow-lg p-3">
+			<img class="card-img-top" src="{% static "img/inicio/propiedades.svg" %}" height="80px">
+			<div class="card-body">
+				<h5 class="card-title">Propiedades</h5>
+				<a href="{% url 'listado_propiedades' %}"><button class="btn btn-sm btn-primary">Listado</button></a>
+				<a href="{% url 'cargar_propiedad' %}"><button class="btn btn-sm btn-info">Cargar</button></a>
+			</div>
+		</div>
+		<div class="card col-md-2 text-center shadow-lg p-3">
+			<img class="card-img-top" src="{% static "img/inicio/propietarios.svg" %}" height="80px">
+			<div class="card-body">
+				<h5 class="card-title">Propietarios</h5>
+				<a href="{% url 'listado_propietarios' %}"><button class="btn btn-sm btn-primary">Listado</button></a>
+				<a href="{% url 'cargar_propietario' %}"><button class="btn btn-sm btn-info">Cargar</button></a>
+			</div>
+		</div>
+	</div>
+	<div class="row justify-content-center pt-5">
+		<div class="col-md-2 mr-3 text-center p-3">
+			<h5 class="text-center" id="calendar-month"></h5>
+			<div class="calendar" id="calendar"></div>
+		</div>
+		<div class="card col-md-2 mr-3 text-center shadow-lg p-3">
+			<img class="card-img-top" src="{% static "img/inicio/inquilinos.svg" %}" height="80px">
+			<div class="card-body">
+				<h5 class="card-title">Inquilinos</h5>
+				<a href="{% url 'listado_inquilinos' %}"><button class="btn btn-sm btn-primary">Listado</button></a>
+				<a href="{% url 'cargar_inquilino' %}"><button class="btn btn-sm btn-info">Cargar</button></a>
+			</div>
+		</div>
+		<div class="card col-md-2 text-center shadow-lg p-3">
+			<img class="card-img-top" src="{% static "img/inicio/parametros.svg" %}" height="80px">
+			<div class="card-body">
+				<h5 class="card-title">Parámetros</h5>
+				<a href="{% url 'parametros' %}"><button class="btn btn-sm btn-info">Configurar</button></a>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock cuerpo %}
+{% block javascript %}
+<script>
+    var calendar = $('#calendar');
+    var days = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+    var months = [
+        'Enero','Febrero','Marzo','Abril',
+        'Mayo','Junio','Julio','Agosto',
+        'Septiembre','Octubre','Noviembre','Diciembre',
+    ]
+    var today = new Date();
+    $('#calendar-month').html(months[today.getMonth()] + ' ' + today.getFullYear());
+    var days_in_month = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
+    var first_day = new Date(today.getFullYear(), today.getMonth(), 1).getDay();
+    if(first_day == 0) first_day = 6;
+    else first_day--;
+    var txt = ''
+    for(let i=0; i < 7; i++) {
+        txt += '<div class="day text-muted">' + days[i] + '</div>';
+    }
+    for(let i=0; i < first_day; i++) {
+        txt += '<div class="day"></div>'
+    }
+    for(let i=1; i <= days_in_month; i++) {
+        if(i == today.getDate()) txt += '<div class="day hoy">' + i + '</div>';
+        else if(i < 10) txt += '<div class="day pago">' + i + '</div>';
+        else txt += '<div class="day vencido">' + i + '</div>';
+    }
+    calendar.html(txt)
+</script>
+{% endblock javascript %}

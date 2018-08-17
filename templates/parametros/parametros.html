@@ -1,0 +1,67 @@
+{% extends "comun.html" %}
+{% block titulo %}Parámetros - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+<div class="container">
+	<h2>Parámetros del sistema</h2>
+	{% if error %}
+	<div class="alert alert-danger" role="alert">
+		{{ error }}
+	</div>
+	{% endif %}
+	{% if guardado %}
+	<div class="alert alert-success" role="alert">
+		Se han guardado los cambios.
+	</div>
+	{% endif %}
+	<form method="post">
+		{% csrf_token %}
+		<div class="form-group">
+			<label for="porcentaje_propietario">Porcentaje del monto mensual correspondiente al propietario</label>
+			<div class="input-group col-lg-4 mb-2">
+				<input class="form-control" type="text" name="porcentaje_propietario" required value="{{ parametros.porcentaje_propietario }}">
+				<div class="input-group-append">
+					<div class="input-group-text">%</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="incremento_anual">Incremento anual del monto del alquiler</label>
+			<div class="input-group col-lg-4 mb-2">
+				<input class="form-control" type="text" name="incremento_anual" required value="{{ parametros.incremento_segundo_anio }}">
+				<div class="input-group-append">
+					<div class="input-group-text">%</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="interes">Interés diario por atrasos de pagos</label>
+			<div class="input-group col-lg-4 mb-2">
+				<input class="form-control" type="text" name="interes" required value="{{ parametros.interes_diario }}">
+				<div class="input-group-append">
+					<div class="input-group-text">%</div>
+				</div>
+			</div>
+		</div>
+		<h5>Emails</h5>
+		<div class="form-group">
+			<label for="email_direccion">Dirección de email de la inmobiliaria</label>
+			<div class="col-auto">
+				<input type="email" class="form-control" name="email_direccion" value="{{ parametros.email_direccion }}" required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="email_asunto">Asunto</label>
+			<div class="col-auto">
+				<input type="text" class="form-control" name="email_asunto" value="{{ parametros.email_asunto }}" required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="email_mensaje">Mensaje</label>
+			<div class="col-auto">
+				<textarea type="text" class="form-control" name="email_mensaje" required>{{ parametros.email_mensaje }}</textarea>
+			</div>
+		</div>
+		<button type="submit" class="btn btn-primary">Guardar</button>
+	</form>
+</div>
+{% endblock cuerpo %}

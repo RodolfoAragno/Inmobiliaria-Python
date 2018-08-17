@@ -1,0 +1,79 @@
+{% extends "comun.html" %}
+{% block titulo %}Alta propiedad - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+	<div class="container">
+		<div class="row">
+			<h2 class="col-auto">Cargar nueva propiedad</h2>
+		</div>
+		<div class="row">
+			{% if propietario.persona.dni is None %}
+			<form class="container" id="busqueda_form">
+				<div class="form-group">
+					<label for="dni">DNI propietario</label>
+					<input type="text" class="form-control" id="busqueda_dni">
+					{% if propietario_error %}No se encontró el propietario.{% endif %}
+				</div>
+				<div class="row">
+					<div class="col-auto"><button type="submit" class="btn btn-primary">Buscar</button></div>
+					<div class="col-auto"><button type="button" class="btn btn-success" onclick="window.open('{% url 'cargar_propietario' %}')">Cargar nuevo propietario</button></div>
+				</div>
+			</form>
+			{% else %}
+			<form class="container" method="POST">
+				{% csrf_token %}
+				<div class="form-row">
+					<div class="form-group col-md-6">
+						<label>Propietario</label>
+						<input type="text" class="form-control" value="{{ propietario.persona.getApellidoNombre }}" readonly>
+					</div>
+					<div class="form-group col-md-6">
+						<label for="dni">DNI</label>
+						<input type="text" class="form-control" name="dni" value="{{ propietario.persona.dni }}" readonly>
+					</div>
+
+				</div>
+				<div class="form-group">
+					<label for="direccion">Dirección</label>
+					<input type="text" class="form-control" name="direccion" required>
+				</div>
+				<div class="form-group">
+					<label for="descripcion">Descripción
+						<small>(Opcional)</small>
+					</label>
+					<textarea class="form-control" name="descripcion"></textarea>
+				</div>
+				<div class="form-row">
+					<div class="form-group col-md-6">
+						<label for="ciudad">Ciudad
+							<small>(Opcional)</small>
+						</label>
+						<input type="text" class="form-control" name="ciudad" value="Santa Fe">
+					</div>
+					<div class="form-group col-md-6">
+						<label for="provincia">Provincia
+							<small>(Opcional)</small>
+						</label>
+						<input type="text" class="form-control" name="provincia" value="Santa Fe">
+					</div>
+				</div>
+				<div class="row justify-content-end">
+					<button type="submit" class="btn btn-primary">Guardar</button>
+				</div>
+			</form>
+			{% endif %}
+		</div>
+	</div>
+{% endblock cuerpo %}
+
+{% block javascript %}
+<script>
+	$('#busqueda_form').submit(function(event){
+		event.preventDefault();
+		if( $('#busqueda_dni').val() != "") {
+			var url = "{% url 'cargar_propiedad' %}/" + $('#busqueda_dni').val()
+			window.location = url
+			return;
+		}
+	})
+</script>
+{% endblock javascript %}

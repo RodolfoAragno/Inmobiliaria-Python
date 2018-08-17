@@ -1,0 +1,88 @@
+{% extends "comun.html" %}
+{% block titulo %}Enviar email - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+<div class="container">
+	<h2 class="text-center">Enviar email</h2>
+	{% if enviado %}
+	<div class="alert alert-success" role="alert">
+		Se ha enviado el email.
+	</div>
+	<a href="{% url 'cobrar' mes.contrato.id mes.id %}">
+		<button type="button" class="btn btn-danger">Volver</button>
+	</a>
+	{% else %}
+		{% if error %}
+		<div class="alert alert-danger" role="alert">
+			{{ error }}
+		</div>
+		{% endif %}
+		<form method="POST">
+			{% csrf_token %}
+			<div class="form-group">
+				<label for="email_inquilino">Email del inquilino</label>
+				<div class="col-auto">
+					<input type="email" class="form-control" name="email_inquilino" value="{{ email_inquilino }}" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="asunto">Asunto</label>
+				<div class="col-auto">
+					<input type="text" class="form-control" name="asunto" value="{{asunto}}" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="cuerpo">Mensaje</label>
+				<div class="col-auto">
+					<textarea class="form-control" name="cuerpo" required>{{cuerpo}}</textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="detalle">Detalle que se adjunta</label>
+				<div id="detalle" class="col-md-6">
+					Propiedad: <strong>{{ mes.contrato.propiedad.direccion }}</strong><br>Mes: <strong>{{ texto_mes }}</strong>.
+					<table>
+						<thead>
+							<tr style="border-bottom: 1px solid black;">
+								<th>Detalle</th>
+								<th style="padding-left: 5em">Valor</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for detalle in mes.getDetalle %}
+							<tr>
+								<td>{{ detalle.descripcion }}</td>
+								<td style="padding-left: 5em">${{ detalle.valor }}</td>
+							</tr>
+							{% endfor %}
+							<tr style="border-top: 1px solid black;">
+								<td>Total</td>
+								<td style="padding-left: 5em">${{ mes.totalACobrar }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<input type="hidden" name="detalle" id="email_detalle">
+			<div class="form-group">
+				<label for="contrasenia">Contraseña del email de la inmobiliaria</label>
+				<div class="col-auto">
+					<input type="password" class="form-control" name="contrasenia" required>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-auto">
+					<button type="submit" class="btn btn-primary">Enviar</button>
+					<a href="{% url 'cobrar' mes.contrato.id mes.id %}">
+						<button type="button" class="btn btn-danger">Volver</button>
+					</a>
+				</div>
+			</div>
+		</form>
+	{% endif %}
+</div>
+{% endblock cuerpo %}
+{% block javascript %}
+<script>
+	$('#email_detalle').val(document.getElementById('detalle').innerHTML)
+</script>
+{% endblock javascript %}

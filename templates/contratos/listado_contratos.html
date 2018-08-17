@@ -1,0 +1,76 @@
+{% extends "comun.html" %}
+{% block titulo %}Contratos - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+    <div class="container-fluid">
+        <div class="row justify-content-between">
+            <div class="col-auto">
+                <h2>Contratos activos</h2>
+            </div>
+            <div class="col-auto">
+                <a href="{% url 'cargar_contrato' %}">
+                    <button type="button" class="btn btn-info">Cargar nuevo contrato</button>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <form>
+                    <div class="form-group row">
+                        <label for="busquedaContratos" class="col-form-label">Búsqueda:</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="busquedaContratos" class="form-control" onkeyup="busquedaFunction()" placeholder="Ingresar dirección o apellidos"
+                                autofocus>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <table class="table table-bordered text-center" id="tablaContratos">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Dirección propiedad</th>
+                    <th>Propietario</th>
+                    <th>Inquilino</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contrato in contratos %}
+                <tr>
+                    <td>{{ contrato.propiedad.direccion }}</td>
+                    <td>{{ contrato.propiedad.propietario.persona.getApellidoNombre }}</td>
+                    <td>{{ contrato.inquilino.persona.getApellidoNombre }}</td>
+                    <td>
+                        <a href="{% url 'ver_contrato' contrato.id %}">
+                            <button type="button" class="btn btn-info btn-sm">Ver detalle</button>
+                        </a>
+                        <a href="{% url 'grilla' contrato.id %}">
+                            <button type="button" class="btn btn-success btn-sm">Facturación</button>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock cuerpo %}
+{% block javascript %}
+<script>
+    function busquedaFunction() {
+        var input, filter, table, tr, td, i;
+        input = document.getElementById("busquedaContratos");
+        filter = input.value.toLowerCase();
+        table = document.getElementById("tablaContratos");
+        tr = table.getElementsByTagName("tr");
+        for (i = 1; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0].innerHTML.toLowerCase() + ' ' +
+                tr[i].getElementsByTagName("td")[1].innerHTML.toLowerCase() + ' ' + tr[i].getElementsByTagName("td")[2].innerHTML.toLowerCase();
+            if (td) {
+                if (td.indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
+{% endblock javascript %}

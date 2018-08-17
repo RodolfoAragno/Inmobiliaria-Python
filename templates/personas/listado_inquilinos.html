@@ -1,0 +1,74 @@
+{% extends "comun.html" %}
+{% block titulo %}Inquilinos - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+<div class="container-fluid">
+    <div class="row justify-content-between">
+        <div class="col-auto">
+            <h2>Inquilinos</h2>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'cargar_inquilino' %}"><button type="button" class="btn btn-info">Cargar nuevo inquilino</button></a>
+        </div>
+        <div class="col-auto">
+            <form>
+                <div class="form-group row">
+                    <label for="busquedaUsuarios" class="col-form-label">Filtrar:</label>
+                    <div class="col-sm-10">
+                        <input type="text" id="busquedaUsuarios" class="form-control" onkeyup="busquedaFunction()" placeholder="Ingresar apellido, nombre o DNI"
+                            autofocus>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <table class="table table-bordered text-center" id="tablaUsuarios">
+        <thead class="thead-dark">
+            <tr>
+                <th>Apellido</th>
+                <th>Nombre</th>
+                <th>DNI</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tabla_inquilinos">
+            {% for inquilino in inquilinos %}
+            <tr>
+                <td>{{ inquilino.persona.apellido }}</td>
+                <td>{{ inquilino.persona.nombre }}</td>
+                <td>{{ inquilino.persona.dni }}</td>
+                <td>{{ inquilino.persona.email }}</td>
+                <td>{{ inquilino.persona.telefono }}</td>
+                <td>
+                    <a href="{% url 'ver_inquilino' inquilino.persona.dni %}"><button type="button" class="btn btn-info btn-sm">Ver detalle</button></a>
+                    <a href="{% url 'modificar_inquilino' inquilino.persona.dni %}"><button type="button" class="btn btn-primary btn-sm">Editar datos</button></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock cuerpo %}
+{% block javascript %}
+<script>
+    function busquedaFunction() {
+        var input, filter, table, tr, td, i;
+        input = document.getElementById("busquedaUsuarios");
+        filter = input.value.toLowerCase();
+        table = document.getElementById("tablaUsuarios");
+        tr = table.getElementsByTagName("tr");
+        for (i = 1; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0].innerHTML.toLowerCase() + ' ' +
+                tr[i].getElementsByTagName("td")[1].innerHTML.toLowerCase() + ' ' + tr[i].getElementsByTagName("td")[2].innerHTML;
+            if (td) {
+                if (td.indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
+{% endblock javascript %}

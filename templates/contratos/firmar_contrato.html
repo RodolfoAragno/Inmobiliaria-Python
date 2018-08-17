@@ -1,0 +1,47 @@
+{% extends "comun.html" %}
+{% load static %}
+{% block titulo %}Firmar contrato - Gazze Inmobiliaria{% endblock titulo %}
+{% block css %}<link rel="stylesheet" href="{% static 'css/datepicker.min.css' %}">{% endblock css %}
+{% block cuerpo %}
+{% if contrato is None %}
+    <div class="container">
+        <h2>Error</h2>
+        No se encontró el contrato.
+    </div>
+{% else %}
+    <div class="container text-center">
+        <h1>Firmar contrato</h1>
+        <h5>{{ contrato.propiedad.direccion }}</h5>
+        <h5>Propietario: {{ contrato.propiedad.propietario.persona.getApellidoNombre }}</h5>
+        <h5>Inquilino: {{ contrato.inquilino.persona.getApellidoNombre }}</h5>
+        <form method="post" class="mt-5">
+			{% csrf_token %}
+			<div class="form-group row justify-content-center">
+				<label for="fecha_firma" class="col-md-2 mt-2">Fecha de firma</label>
+				<input type="text"
+					class="form-control datepicker-here col-md-4"
+					data-language="es"
+					data-date-format="dd/mm/yyyy" 
+					id="fecha_firma"
+					name="fecha_firma"/>
+			</div>
+			<button type="submit" class="btn btn-primary">Guardar</button>
+		</form>
+    </div>
+{% endif %}
+{% endblock cuerpo %}
+
+{% block javascript %}
+<script src="{% static "js/datepicker.min.js" %}"></script>
+<script src="{% static "js/datepicker.es.js" %}"></script>
+<script>
+	$('#fecha_firma').datepicker({
+		language: 'es',
+		minDate: new Date(2010),
+		autoClose: true
+	})
+	var myDatepicker = $('#fecha_firma').datepicker().data('datepicker');
+	myDatepicker.selectDate(new Date())
+	//$('#fecha_firma').val(new Date().toLocaleDateString())
+</script>
+{% endblock javascript %}

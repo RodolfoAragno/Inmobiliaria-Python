@@ -1,0 +1,348 @@
+{% extends "comun.html" %}
+{% load static %}
+{% block titulo %}Grilla contrato - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+<div class="container-fluid" id="grilla">
+	<div class="row justify-content-between">
+        <div class="col-auto">
+            <h5>Facturación para la propiedad
+                <strong>{{ contrato.propiedad.direccion }}</strong>
+            </h5>
+            Propietario:
+            <strong>{{ contrato.propiedad.propietario.persona.getNombreApellido }}</strong> - Inquilino:
+            <strong>{{ contrato.inquilino.persona.getNombreApellido }}</strong>.
+        </div>
+    </div>
+	<table class="table table-bordered text-center">
+		<thead class="thead-dark">
+			<tr>
+				<th>MES</th>
+				<th>INQUILINO</th>
+				<th>PROPIETARIO</th>
+				<th>TASA</th>
+				<th>AGUA</th>
+				<th>API</th>
+				<th>EXPENSAS</th>
+				<th>VARIOS</th>
+				<th>INTERESES</th>
+				<th>COBROS</th>
+				<th>PAGOS</th>
+			</tr>
+		</thead>
+		<tr v-for="(mes, index) in dataGrilla"
+			v-bind:class="{ 'segundo-anio': index == 12, 'bg-pagado': mes.pagado_inquilino && mes.pagado_propietario}">
+			<td>[[ mes.mes ]]</td>
+			<td v-bind:class="{ 'bg-pagado': mes.pagado_inquilino, 'bg-no-pagado': mes.intereses > 0 && !mes.pagado_inquilino }">$[[ monedaATexto(mes.inquilino) ]]</td>
+			
+			<td v-bind:class="{ 'bg-pagado': mes.pagado_propietario }">
+				$[[ totalPropietario(mes) ]]
+				<button class="btn btn-link btn-sm text-danger" v-on:click="variosPropietario(index)" v-if="!mes.pagado_propietario	">
+					<i data-feather="plus"></i>
+				</button>
+			</td>
+			<td v-bind:class="{ 'bg-invalido': mes.tasa == null && !mes.pagado_inquilino}">
+				$[[ monedaATexto(mes.tasa) ]]
+				<button class="btn btn-link btn-sm" v-on:click="cambiaCelda(index, 3)" v-if="!mes.pagado_inquilino">
+					<i data-feather="plus"></i>
+				</button>
+			</td>
+			<td v-bind:class="{ 'bg-invalido': mes.agua == null && !mes.pagado_inquilino}">
+				$[[ monedaATexto(mes.agua) ]]
+				<button class="btn btn-link btn-sm" v-on:click="cambiaCelda(index, 4)" v-if="!mes.pagado_inquilino">
+					<i data-feather="plus"></i>
+				</button>
+			</td>
+			<td v-bind:class="{ 'bg-invalido': mes.api == null && !mes.pagado_inquilino}">
+				$[[ monedaATexto(mes.api) ]]
+				<button class="btn btn-link btn-sm" v-on:click="cambiaCelda(index, 5)" v-if="!mes.pagado_inquilino">
+					<i data-feather="plus"></i>
+				</button>
+			</td>
+			<td v-bind:class="{ 'bg-invalido': mes.expensas == null && !mes.pagado_inquilino}">
+				$[[ monedaATexto(mes.expensas) ]]
+				<button class="btn btn-link btn-sm" v-on:click="cambiaCelda(index, 6)" v-if="!mes.pagado_inquilino">
+					<i data-feather="plus"></i>
+				</button>
+			</td>
+			<td>
+				$[[ monedaATexto(totalVarios(mes)) ]]
+				<button class="btn btn-link btn-sm" v-on:click="variosInquilino(index)" v-if="!mes.pagado_inquilino">
+					<i data-feather="plus"></i>
+				</button>
+			</td>
+			<td>$[[ monedaATexto(mes.intereses) ]]</td>
+			<td v-bind:class="{ 'bg-pagado': mes.pagado_inquilino, 'bg-no-pagado': mes.intereses > 0 && !mes.pagado_inquilino }">
+				<button class="btn btn-primary btn-sm" v-if="mes.pagado_inquilino" v-on:click="cobrarInquilino(mes)">Ver</button>
+				<button class="btn btn-primary btn-sm" v-else v-bind:disabled="!puedePagar(index, mes)" v-on:click="cobrarInquilino(mes)">
+					Cobrar
+					<div v-if="puedePagar(index, mes)">($[[ totalAPagar(mes) ]])</div>
+				</button>
+			</td>
+			<td v-bind:class="{ 'bg-pagado': mes.pagado_propietario }">
+				<button class="btn btn-primary btn-sm" v-if="mes.pagado_propietario" v-on:click="cobrarPropietario(mes)">Ver</button>
+				<button class="btn btn-primary btn-sm" v-else  v-on:click="cobrarPropietario(mes)">Pagar<br>($[[ totalPropietario(mes) ]])</button>
+			</td>
+		</tr>
+	</table>
+</div>
+{% endblock cuerpo %}
+{% block javascript %}
+<script src="{% static "js/vue.js" %}"></script>
+<script src="{% static "js/bootbox.min.js" %}"></script>
+<script>
+	bootbox.setLocale('es')
+	var app = new Vue({
+		delimiters: ['[[', ']]'],
+		el: '#grilla',
+		data: {
+			dataGrilla: []
+		},
+		methods: {
+			cobrarInquilino: function(mes) {
+				window.location = window.location + '/cobrar/' + mes.id_mes
+			},
+			cobrarPropietario: function(mes) {
+				window.location = window.location + '/pagar/' + mes.id_mes
+			},
+			totalVarios: function(mes) {
+				var total = 0.0;
+				for (var i = 0, len = mes.varios_inquilino.length; i < len; i++) {
+					total += parseFloat(mes.varios_inquilino[i].monto);
+				}
+				return total;
+			},
+			totalAPagar: function(mes) {
+				return this.monedaATexto(mes.inquilino + mes.tasa + mes.agua + mes.api + mes.expensas + mes.intereses + this.totalVarios(mes))
+			},
+			totalPropietario: function(mes) {
+				var total = mes.propietario;
+				for (var i = 0, len = mes.varios_propietario.length; i < len; i++) {
+					total += parseFloat(mes.varios_propietario[i].monto);
+				}
+				return this.monedaATexto(total);
+			},
+			puedePagar: function(index, mes) {
+				if(mes.tasa != null && mes.agua != null && mes.api != null && mes.expensas != null){
+					if(index > 0) {
+						if(this.dataGrilla[index-1].pagado_inquilino) return true;
+					}
+					else return true;
+				}
+				return false;
+			},
+			getMeses: function (){
+				$.ajax({
+					method: "GET",
+					url: "/ajax/meses/" + '{{ contrato.id }}'
+				}).done(function(respuesta) {
+					app.dataGrilla = respuesta
+				})
+			},
+			textoAMoneda: function (txt){
+				console.log(txt)
+				if(txt == '') return null;
+				var res = txt.replace(',', '.')
+				return parseFloat(res)
+			},
+			monedaATexto: function (moneda){
+				if(moneda == null) return '';
+				var txt = moneda.toFixed(2)
+				var res = txt.replace('.',',')
+				return res
+			},
+			variosPropietario: function (index){
+				var msg = 'Varios PROPIETARIO - ' + this.dataGrilla[index].mes;
+				var contenido = '<p>Deben cargarse ambos campos para cada concepto. De lo contrario, el dicho detalle se descartará o eliminará.</p><div class="row"><div class="col"><label>Descripción</label></div><div class="col"><label>Monto</label></div></div><div class="row" id="dialogo_varios_prop">';
+				for (var i = 0, len = this.dataGrilla[index].varios_propietario.length; i < len; i++) {
+					contenido += '<input type="hidden" class="col-md-6 form-control" value="' + this.dataGrilla[index].varios_propietario[i].id + '">';
+					contenido += '<input type="text" class="col-md-6 form-control" value="' + this.dataGrilla[index].varios_propietario[i].descripcion + '">';
+					contenido += '<input type="text" class="col-md-6 form-control" value="' + this.dataGrilla[index].varios_propietario[i].monto.replace('.', ',') + '">';
+				}
+				contenido += '</div>'
+				var dialogo_varios_prop = bootbox.dialog({
+					title: msg,
+					message: contenido,
+					onEscape: true,
+					buttons: {
+						noclose: {
+							label: "Agregar",
+							className: 'btn-sm btn-warning',
+							callback: function(){
+								let input_text = '<input type="hidden" class="col-md-6 form-control" value="-1">';
+								input_text += '<input type="text" class="col-md-6 form-control">';
+								input_text += '<input type="text" class="col-md-6 form-control">';
+								dialogo_varios_prop.find('#dialogo_varios_prop').append(
+									input_text
+								)
+								return false;
+							}
+						},
+						ok: {
+							label: "Guardar	",
+							className: 'btn-sm btn-primary',
+							callback: function(){
+								var arr = dialogo_varios_prop.find('input');
+								var val = []
+								for (let i = 0; i < arr.length; i+=3) {
+									val.push({
+										id: arr[i].value,
+										descripcion: arr[i+1].value,
+										monto: arr[i+2].value.replace(',', '.')
+									})
+								}
+
+								var csrftoken = getCookie('csrftoken');
+								$.ajax({
+									method: "POST",
+									url: "/ajax/modificar_mes",
+									data: {
+										id_mes: app.dataGrilla[index].id_mes,
+										impuesto: 'varios_propietario',
+										nuevo_valor: JSON.stringify(val),
+										'csrfmiddlewaretoken': '{{ csrf_token }}'
+									}
+								}).done(function(respuesta) {
+									var temp = app.dataGrilla
+									temp[index] = respuesta
+									app.dataGrilla = []
+									app.dataGrilla = temp
+								});
+							}
+						},
+						cancel: {
+							label: "Cancelar",
+							className: 'btn-sm btn-danger',
+							callback: function(){
+							}
+						}
+					}
+				});
+			},
+			variosInquilino: function (index){
+				var msg = 'VARIOS INQUILINO - ' + this.dataGrilla[index].mes;
+				var contenido = '<p>Deben cargarse ambos campos para cada concepto. De lo contrario, el dicho detalle se descartará o eliminará.</p><div class="row"><div class="col"><label>Descripción</label></div><div class="col"><label>Monto</label></div></div><div class="row" id="dialogo_varios_inq">';
+				for (var i = 0, len = this.dataGrilla[index].varios_inquilino.length; i < len; i++) {
+					contenido += '<input type="hidden" class="col-md-6 form-control" value="' + this.dataGrilla[index].varios_inquilino[i].id + '">';
+					contenido += '<input type="text" class="col-md-6 form-control" value="' + this.dataGrilla[index].varios_inquilino[i].descripcion + '">';
+					contenido += '<input type="text" class="col-md-6 form-control" value="' + this.dataGrilla[index].varios_inquilino[i].monto.replace('.', ',') + '">';
+				}
+				contenido += '</div>'
+				var dialogo_varios_inq = bootbox.dialog({
+					title: msg,
+					message: contenido,
+					onEscape: true,
+					buttons: {
+						noclose: {
+							label: "Agregar",
+							className: 'btn-sm btn-warning',
+							callback: function(){
+								let input_text = '<input type="hidden" class="col-md-6 form-control" value="-1">';
+								input_text += '<input type="text" class="col-md-6 form-control">';
+								input_text += '<input type="text" class="col-md-6 form-control">';
+								dialogo_varios_inq.find('#dialogo_varios_inq').append(
+									input_text
+								)
+								return false;
+							}
+						},
+						ok: {
+							label: "Guardar	",
+							className: 'btn-sm btn-primary',
+							callback: function(){
+								var arr = dialogo_varios_inq.find('input');
+								var val = []
+								for (let i = 0; i < arr.length; i+=3) {
+									val.push({
+										id: arr[i].value,
+										descripcion: arr[i+1].value,
+										monto: arr[i+2].value.replace(',', '.')
+									})
+								}
+
+								var csrftoken = getCookie('csrftoken');
+								$.ajax({
+									method: "POST",
+									url: "/ajax/modificar_mes",
+									data: {
+										id_mes: app.dataGrilla[index].id_mes,
+										impuesto: 'varios_inquilino',
+										nuevo_valor: JSON.stringify(val),
+										'csrfmiddlewaretoken': '{{ csrf_token }}'
+									}
+								}).done(function(respuesta) {
+									var temp = app.dataGrilla
+									temp[index] = respuesta
+									app.dataGrilla = []
+									app.dataGrilla = temp
+								});
+							}
+						},
+						cancel: {
+							label: "Cancelar",
+							className: 'btn-sm btn-danger',
+							callback: function(){
+							}
+						}
+					}
+				});
+			},
+			cambiaCelda: function(i, j) {
+				if(i < 0 || i > 24 || j < 3 || j > 6) return;
+				var msg = ''
+				var impuestos = ['tasa', 'agua', 'api', 'expensas']
+				var impuesto_actual = impuestos[j-3]
+				msg = impuesto_actual.toLocaleUpperCase() + ' - ' + this.dataGrilla[i].mes
+				var valor_actual = this.monedaATexto(this.dataGrilla[i][impuesto_actual])
+				if(valor_actual < "1") valor_actual = ""
+				bootbox.prompt({
+					title: msg,
+					inputType: 'text',
+					value: valor_actual,
+					callback: function(nuevoValor){
+						if(nuevoValor != null){
+							var val = app.textoAMoneda(nuevoValor)
+							console.log('setting ' + i + ' imp: ' + impuesto_actual + ' to: ' + val)
+							app.dataGrilla[i][impuesto_actual] = val
+
+							var csrftoken = getCookie('csrftoken');
+							$.ajax({
+								method: "POST",
+								url: "/ajax/modificar_mes",
+								data: {
+									id_mes: app.dataGrilla[i].id_mes,
+									impuesto: impuesto_actual,
+									nuevo_valor: val,
+									'csrfmiddlewaretoken': '{{ csrf_token }}'
+								}
+							}).done(function(respuesta) {
+								var temp = app.dataGrilla
+								temp[i] = respuesta
+								app.dataGrilla = []
+								app.dataGrilla = temp
+							});
+						}
+					}
+				});
+			}
+		},
+		mounted(){
+			this.getMeses()
+		},
+	});
+	function getCookie(name) {
+		var cookieValue = null;
+		if (document.cookie && document.cookie !== '') {
+			var cookies = document.cookie.split(';');
+			for (var i = 0; i < cookies.length; i++) {
+				var cookie = jQuery.trim(cookies[i]);
+				// Does this cookie string begin with the name we want?
+				if (cookie.substring(0, name.length + 1) === (name + '=')) {
+					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+					break;
+				}
+			}
+		}
+		return cookieValue;
+	}
+</script>
+{% endblock javascript %}

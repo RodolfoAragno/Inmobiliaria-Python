@@ -1,0 +1,59 @@
+{% extends "comun.html" %}
+{% block titulo %}Información de contrato - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+{% if contrato is None %}
+    <div class="container">
+        <h2>Error</h2>
+        No se encontró el contrato.
+    </div>
+{% else %}
+    <div class="container text-center">
+        <h1>Información del contrato</h1>
+        <h5><a href="{% url 'ver_propiedad' contrato.propiedad.id %}">{{ contrato.propiedad.direccion }}</a></h5>
+        {% if contrato.fecha_firma is not None %}<h5>Contrato firmado el {{ contrato.fecha_firma }}</h5>
+        {% else %}<h5 class="text-danger">Contrato no firmado</h5>{% endif %}
+        <h5>Propietario: <a href="{% url 'ver_propietario' contrato.propiedad.propietario.persona.dni %}">{{ contrato.propiedad.propietario.persona.getApellidoNombre }}</a>
+        <h5>Inquilino: <a href="{% url 'ver_inquilino' contrato.inquilino.persona.dni %}">{{ contrato.inquilino.persona.getApellidoNombre }}</a></h5>
+        <div class="row justify-content-center mb-2">
+            {% if contrato.fecha_firma is None or contrato.fecha_firma == '' %}
+            <div class="col-auto"><a href="{% url 'firmar_contrato' contrato.id %}"><button class="btn btn-small btn-info">Contrato firmado</button></a></div>
+            {% else %}
+            <div class="col-auto"><a href="{% url 'grilla' contrato.id %}"><button class="btn btn-small btn-success">Facturación</button></a></div>
+            {% endif %}
+            <div class="col-auto"><a href="{% url 'baja_contrato' contrato.id %}"><button class="btn btn-small btn-danger">Dar de baja</button></a></div>
+            <div class="col-auto"><a href="{% url 'descargar_contrato' contrato.id %}"><button class="btn btn-small btn-warning">Descargar documento</button></a></div>
+            <div class="col-auto"><a href="{% url 'descargar_autorizacion' contrato.id %}"><button class="btn btn-small btn-primary">Descargar autorización</button></a></div>
+        </div>
+        <hr>
+        <h2>Detalles</h2>
+        <h4>Primer período</h4>
+        <h6><strong>{{ contrato.fecha_inicio }}</strong> al <strong>{{ contrato.fecha_mitad }}</strong></h6>
+        <h6>Monto mensual del alquiler: ${{ contrato.monto_primer_anio }}</h6>
+        <h4 class="mt-3">Segundo período</h4>
+        <h6><strong>{{ contrato.fecha_mitad }}</strong> al <strong>{{ contrato.fecha_fin }}</strong></h6>
+        <h6>Monto mensual del alquiler: ${{ contrato.monto_segundo_anio }}</h6>
+        <hr>
+        <h2 class="mt-3">Garantes</h2>
+        <table class="table table-sm table-bordered text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>DNI</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                </tr>
+            </thead>
+            <tbody id="tabla_inquilinos">
+                {% for garante in contrato.garantes.all %}
+                <tr>
+                    <td>{{ garante.getApellidoNombre }}</td>
+                    <td>{{ garante.dni }}</td>
+                    <td>{{ garante.email }}</td>
+                    <td>{{ garante.telefono }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+{% endblock cuerpo %}

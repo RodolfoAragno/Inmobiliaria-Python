@@ -1,0 +1,60 @@
+{% extends "comun.html" %}
+{% block titulo %}Alta inquilino - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+	<div class="container">
+			<form class="container" method="POST" id="cargar_form">
+				{% csrf_token %}
+				<div class="form-row">
+					<div class="form-group col-md-4">
+						<label for="dni">DNI</label>
+						<input type="text" class="form-control" name="dni" value="{{persona.dni}}" {% if persona.dni  %} readonly {% endif %}>
+					</div>
+					<div class="form-group col-md-4">
+						<label for="apellido">Apellido</label>
+						<input type="text" class="form-control" name="apellido" value="{{persona.apellido}}" required>
+					</div>
+					<div class="form-group col-md-4">
+						<label for="nombre">Nombre</label>
+						<input type="text" class="form-control" name="nombre" value="{{persona.nombre}}" required>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="form-group col-md-4">
+						<label for="email">Email
+							<small>(Opcional)</small>
+						</label>
+						<input type="email" class="form-control" name="email" value="{{persona.email}}">
+					</div>
+					<div class="form-group col-md-4">
+						<label for="telefono">Teléfono
+							<small>(Opcional)</small>
+						</label>
+						<input type="text" class="form-control" name="telefono" value="{{persona.telefono}}">
+					</div>
+					<div class="form-group col-md-4">
+						<label for="nacionalidad">Nacionalidad</label>
+						<input type="text" class="form-control" name="nacionalidad" value="{{persona.nacionalidad}}">
+					</div>
+				</div>
+				<div class="row justify-content-between">
+					<div class="col-auto"><button type="submit" class="btn btn-primary">Guardar</button></div>
+					<div class="col-auto"><a href="{% url 'eliminar_inquilino' persona.dni %}"><button type="button" class="btn btn-danger">Dar de baja</button></a></div>
+				</div>
+			</form>
+		</div>
+{% endblock cuerpo %}
+{% block javascript %}
+<script>
+	{% if error %}
+	alert("{{error}}")
+	{% endif %}
+	$('#busqueda_form').submit(function(event){
+		event.preventDefault();
+		if( $('#busqueda_dni').val() != "") {
+			var url = "{% url 'cargar_inquilino' %}/" + $('#busqueda_dni').val()
+			window.location = url
+			return;
+		}
+	})
+</script>
+{% endblock javascript %}

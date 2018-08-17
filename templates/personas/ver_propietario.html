@@ -1,0 +1,85 @@
+{% extends "comun.html" %}
+{% block titulo %}
+{% if propietario is None %}Propietario - Gazze Inmobiliaria
+{% else %}Propietario {{ propietario.persona.getApellidoNombre }} - Gazze Inmobiliaria{% endif %}
+{% endblock titulo %}
+{% block cuerpo %}
+	{% if propietario is None %}
+		<div class="container">
+			<h2>Error</h2>
+			No se encontró el propietario.
+		</div>
+	{% else %}
+		<div class="container text-center pt-4">
+			<h1 class="mb-3">Información del propietario</h1>
+			<h5>{{ propietario.persona.getApellidoNombre }}</h5>
+			<h5>DNI {{ propietario.persona.dni }}</h5>
+			{% if propietario.persona.email != '' %}<h5>Email: {{ propietario.persona.email }}</h5>{% endif %}
+			{% if propietario.persona.telefono != '' %}<h5>Teléfono: {{ propietario.persona.telefono }}</h5>{% endif %}
+			{% if propietario.persona.direccion != '' %}<h5>Dirección: {{ propietario.persona.direccion }}</h5>{% endif %}
+			{% if propietario.persona.ciudad != '' %}<h5>Ciudad: {{ propietario.persona.ciudad }}</h5>{% endif %}
+			{% if propietario.persona.provincia != '' %}<h5>Provincia: {{ propietario.persona.provincia }}</h5>{% endif %}
+			<a href="{% url 'modificar_propietario' propietario.persona.dni %}"><button class="btn btn-small btn-info">Editar información</button></a>
+			<hr>
+			<h2 class="mt-4">Propiedades</h2>
+			{% if propiedades %}
+			<table class="table table-bordered table-sm">
+				<thead class="thead-dark">
+					<th>Dirección</th>
+					<th></th>
+				</thead>
+				<tbody>
+				{% for propiedad in propiedades %}
+				{% if propiedad.activa %}
+				<tr>
+					<td>{{ propiedad.direccion }}</td>
+					<td><a href="{% url 'ver_propiedad' propiedad.id %}"><button class="btn btn-sm btn-primary">Ver propiedad</button></a></td>
+				{% else %}
+				<tr class="bg-invalido">
+					<td>{{ propiedad.direccion }}</td>
+					<td><a href="{% url 'modificar_propiedad' propiedad.id %}"><button class="btn btn-sm btn-primary">Dar de alta</button></a></td>
+				{% endif %}
+				</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+			{% else %}
+			<h6>No cuenta con propiedades cargadas.</h6>
+			{% endif %}
+			<a href="{% url 'cargar_propiedad' propietario.persona.dni %}"><button class="btn btn-small btn-warning">Cargar nueva</button></a>
+			<hr>
+			<h2 class="mt-4">Contratos activos</h2>
+			{% if contratos %}
+			<table class="table table-bordered table-sm">
+				<thead class="thead-dark">
+					<th>Propiedad</th>
+					<th>Inquilino</th>
+					<th>Fecha de inicio</th>
+					<th>Fecha de finalización</th>
+					<th></th>
+				</thead>
+				<tbody>
+					{% for contrato in contratos %}
+					<tr>
+						<td>{{ contrato.propiedad.direccion }}</td>
+						<td>{{ contrato.inquilino.persona.getApellidoNombre }}</td>
+						<td>{{ contrato.fecha_inicio }}</td>
+						<td>{{ contrato.fecha_fin }}</td>
+						<td>
+							<a href="{% url 'ver_contrato' contrato.id %}"><button type="button" class="btn btn-sm btn-primary">Ver contrato</button></a>
+							{% if contrato.fecha_firma %}
+							<a href="{% url 'grilla' contrato.id %}">
+								<button type="button" class="btn btn-sm btn-success">Facturación</button>
+							</a>
+							{% endif %}
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			{% else %}
+			<h6>No cuenta con contratos activos.</h6>
+			{% endif %}
+		</div>
+	{% endif %}
+{% endblock cuerpo %}

@@ -1,0 +1,78 @@
+{% extends "comun.html" %}
+{% block titulo %}Cobrar alquiler - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+<div class="container">
+    <div class="text-center">
+        <h2>Cobrar alquiler</h2>
+        <h4>Inquilino: {{ mes.contrato.inquilino.persona.getNombreApellido }}</h4>
+        <h4>Propiedad: {{ mes.contrato.propiedad.direccion }}</h4>        
+        {% if mes.fecha_pagado_inquilino %}
+            <h5>Detalle pagado para el mes {{ texto_mes.upper }}</h5>
+            <span>Fecha de pago: {{ mes.fecha_pagado_inquilino }}</span>
+        {% else %}
+            <h5>Detalle a pagar para el mes {{ texto_mes.upper }}</h5>            
+        {% endif %}
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-sm-6">
+            <table class="table table-sm table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Detalle</th>
+                        <th class="text-right">Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in mes.getDetalle %}
+                    <tr>
+                        <td>{{ detalle.descripcion }}</td>
+                        <td class="text-right">${{ detalle.valor }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="segundo-anio">
+                        {% if mes.fecha_pagado_inquilino %}
+                        <td>Total</td>
+                        {% else %}
+                        <td>Total</td>
+                        {% endif %}
+                        <td class="text-right">${{ mes.totalACobrar }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        {% if mes.fecha_pagado_inquilino is not None %}
+		<div class="col-auto">
+			<a href="{% url 'recibo_cobro' mes.contrato.id mes.id %}"><button type="button" class="btn btn-warning">Imprimir recibo</button></a>
+		</div>
+		{% else %}
+		<div class="col-auto">
+			<a href="{% url 'enviar_email' mes.contrato.id mes.id %}">
+				<button type="button" class="btn btn-success">Enviar email</button>
+			</a>
+		</div>
+		<div class="col-auto">
+			<form method="post">
+				{% csrf_token %}
+				<button type="submit" class="btn btn-primary">Cobrar</button>
+			</form>
+		</div>
+        {% endif %}
+        <div class="col-auto">
+            <a href="{% url 'grilla' mes.contrato.id %}"><button class="btn btn-danger">Volver</button></a>
+        </div>
+    </div>
+</div>
+{% endblock cuerpo %}
+{% block javascript %}
+<script>
+	function enviarMail() {
+		var mail_inquilino = "{{ mes.contrato.inquilino.persona.email }}";
+		var asunto = "Detalle a pagar para el mes {{ texto_mes }}";
+		var cuerpo = `{{ email_cuerpo }}`
+		var url_gmail = `https://mail.google.com/mail/u/0/?view=cm&fs=1&to=${mail_inquilino}&tf=1&su=${asunto}&body=${cuerpo}`;
+		window.open(url_gmail)
+	}
+</script>
+{% endblock javascript %}

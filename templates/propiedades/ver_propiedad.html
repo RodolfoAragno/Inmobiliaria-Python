@@ -1,0 +1,47 @@
+{% extends "comun.html" %}
+{% block titulo %}
+{% if propiedad is None %}Propiedad - Gazze Inmobiliaria
+{% else %}Propiedad {{ propiedad.direccion }} - Gazze Inmobiliaria{% endif %}
+{% endblock titulo %}
+{% block cuerpo %}
+	{% if propiedad is None %}
+		<div class="container">
+			<h2>Error</h2>
+			No se encontró la propiedad.
+		</div>
+	{% else %}
+		<div class="container text-center">
+			<h1>Información de la propiedad</h1>
+			<h5>{{ propiedad.direccion }}</h5>
+			<h5>Propietario: <a href="{% url 'ver_propietario' propiedad.propietario.persona.dni %}">{{ propiedad.propietario.persona.getApellidoNombre }}</a>
+			{% if propiedad.descripcion != '' %}<h5>Descripción: {{ propiedad.descripcion }}</h5>{% endif %}
+			{% if propiedad.ciudad != '' %}<h5>Ciudad: {{ propiedad.ciudad }}</h5>{% endif %}
+			{% if propiedad.provincia != '' %}<h5>Provincia: {{ propiedad.provincia }}</h5>{% endif %}
+			<div class="row justify-content-center">
+				<div class="col-auto">
+					<a href="{% url 'modificar_propiedad' propiedad.id %}"><button class="btn btn-small btn-info">Editar información</button></a>
+				</div>
+				<div class="col-auto">
+					<a><button class="btn btn-small btn-warning">Descargar poder</button></a>
+				</div>
+			</div>
+			<hr>
+			{% if contrato %}
+			<h2>Contrato activo</h2>
+			<h5>Inquilino: <a href="{% url 'ver_inquilino' contrato.inquilino.persona.dni %}">{{ contrato.inquilino.persona.getApellidoNombre }}</a></h5>
+			<h5>Fecha de inicio: {{ contrato.fecha_inicio }}</h5>
+			<h5>Fecha de fin: {{ contrato.fecha_fin }}</h5>
+			<div class="row justify-content-center">
+				<div class="col-auto"><a href="{% url 'ver_contrato' contrato.id %}"><button class="btn btn-primary">Ver contrato</button></a></div>
+				{% if contrato.fecha_firma %}
+				<div class="col-auto">
+					<a href="{% url 'grilla' contrato.id %}">
+						<button type="button" class="btn btn-success">Facturación</button>
+					</a>
+				</div>
+				{% endif %}
+			</div>
+			{% endif %}
+		</div>
+	{% endif %}
+{% endblock cuerpo %}

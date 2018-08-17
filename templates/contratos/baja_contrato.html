@@ -1,0 +1,22 @@
+{% extends "comun.html" %}
+{% block titulo %}Inquilinos - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+{% if contrato is None %}
+    <div class="container">
+        <h2>Error</h2>
+        No se encontró el contrato.
+    </div>
+{% else %}
+    <div class="container text-center">
+        <h1>Baja de contrato</h1>
+        <h5>{{ contrato.propiedad.direccion }}</h5>
+        <h5>Propietario: <a href="{% url 'ver_propietario' contrato.propiedad.propietario.persona.dni %}">{{ contrato.propiedad.propietario.persona.getApellidoNombre }}</a>
+        <h5>Inquilino: <a href="{% url 'ver_inquilino' contrato.inquilino.persona.dni %}">{{ contrato.inquilino.persona.getApellidoNombre }}</a></h5>
+        <h6>¿Está seguro de que desea dar de baja este contrato?</h6>
+        <small>La información del contrato no se eliminará</small>
+        <div class="row justify-content-center">
+            <div class="col-auto"><form method="POST">{% csrf_token %}<button class="btn btn-danger" type="submit">Dar de baja</button></form></div>
+            <div class="col-auto"><a href="{% url 'ver_contrato' contrato.id %}"><button class="btn btn-primary" type="button">Volver</button></a></div>
+    </div>
+{% endif %}
+{% endblock cuerpo %}

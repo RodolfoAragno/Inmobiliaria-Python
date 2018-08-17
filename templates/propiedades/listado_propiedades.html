@@ -1,0 +1,70 @@
+{% extends "comun.html" %}
+{% block titulo %}Propiedades - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+    <div class="container-fluid">
+        <div class="row justify-content-between">
+            <div class="col-md-5">
+                <h2>Propiedades</h2>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'cargar_propiedad' %}"><button type="button" class="btn btn-info">Cargar nueva propiedad</button></a>
+            </div>
+            <div class="col-md-3">
+                <form>
+                    <div class="form-group row">
+                        <label for="busquedaPropiedades" class="col-form-label">Filtrar:</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="busquedaPropiedades" class="form-control" onkeyup="busquedaFunction()" placeholder="Buscar por dirección o propietario"
+                                autofocus>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <table class="table table-bordered text-center" id="tablaPropiedades">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Dirección</th>
+                    <th>Propietario</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+				{% for propiedad in propiedades %}
+                <tr>
+                    <td>{{ propiedad.direccion }}</td>
+                    <td>{{ propiedad.propietario.persona.getApellidoNombre }}</td>
+                    <td>
+                        <a href="{% url 'ver_propiedad' propiedad.id %}"><button type="button" class="btn btn-info btn-sm">Ver detalle</button></a>
+                        <a href="{% url 'modificar_propiedad' propiedad.id %}"><button type="button" class="btn btn-primary btn-sm">Editar propiedad</button></a>
+                        {% if propiedad.getContratoActivo and propiedad.getContratoActivo.fecha_firma %}
+                        <a href="{% url 'grilla' propiedad.getContratoActivo.id %}"><button type="button" class="btn btn-success btn-sm">Facturación</button></a>
+                        {% endif %}
+                    </td>
+                </tr>
+				{% endfor %}
+    </div>
+{% endblock cuerpo %}
+
+{% block javascript %}
+    <script>
+        function busquedaFunction() {
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("busquedaPropiedades");
+            filter = input.value.toLowerCase();
+            table = document.getElementById("tablaPropiedades");
+            tr = table.getElementsByTagName("tr");
+            for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0].innerHTML + ' ' +
+                    tr[i].getElementsByTagName("td")[1].innerHTML.toLowerCase() + ' ' + tr[i].getElementsByTagName("td")[2].innerHTML.toLowerCase();
+                if (td) {
+                    if (td.indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+{% endblock javascript %}

@@ -1,0 +1,493 @@
+{% extends "comun.html" %}
+{% load static %}
+{% block titulo %}Cargar contrato - Gazze Inmobiliaria{% endblock titulo %}
+{% block css %}<link rel="stylesheet" href="{% static 'css/datepicker.min.css' %}">{% endblock css %}
+{% block cuerpo %}
+<div class="container-fluid" id="contrato">
+	<div class="row">
+		<div class="col-md-4 order-md-2 mb-4">
+			<h4 class="d-flex justify-content-between mb-3">
+				<span class="text-muted">Contrato</span>
+			</h4>
+			<ul class="list-group mb-3">
+				<li class="list-group-item d-flex justify-content-between" onclick="seleccionoPropiedad()" v-bind:class="{ 'bg-pagado': propiedad.id}">
+					<div>
+						<h6 class="my-0">Propiedad</h6>
+					</div>
+					<span>[[ propiedad.direccion ]]</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between" v-bind:class="{ 'bg-pagado': propiedad.dni_propietario}">
+					<div>
+						<h6 class="my-0">Propietario</h6>
+					</div>
+					<span>[[ propiedad.nombre_propietario ]]</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between" onclick="seleccionoInquilino()" v-bind:class="{ 'bg-pagado': inquilino.dni}">
+					<div>
+						<h6 class="my-0">Inquilino</h6>
+					</div>
+					<span>[[ inquilino.nombre ]]</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between" onclick="seleccionoGarantes()" v-bind:class="{ 'bg-pagado': garantes.length > 0}">
+					<div>
+						<h6 class="my-0">Garantes</h6>
+					</div>
+					<table class="table-sm">
+						<tbody>
+							<tr v-for="garante in garantes">
+								<td>[[ garante.nombre ]]</td>
+							</tr>
+						</tbody>
+					</table>
+				</li>
+				<li class="list-group-item d-flex justify-content-between" onclick="seleccionoDetalles()" v-bind:class="{ 'bg-pagado': detalles.fecha_inicio != ''}">
+					<div>
+						<h6 class="my-0">Detalles</h6>
+					</div>
+					<table class="table-sm">
+						<tbody>
+							<tr>
+								<td>Fecha de inicio</td>
+								<td>[[ detalles.fecha_inicio ]]</td>
+							</tr>
+							<tr>
+								<td>Fecha de fin</td>
+								<td>[[ detalles.fecha_fin ]]</td>
+							</tr>
+						</tbody>
+					</table>
+				</li>
+				<li class="list-group-item d-flex justify-content-between"  onclick="seleccionoMontos()" v-bind:class="{ 'bg-pagado': monto.primero > 0}">
+					<div>
+						<h6 class="my-0">Monto</h6>
+					</div>
+					<table class="table-sm">
+						<tbody>
+							<tr>
+								<td>Primer año</td>
+								<td>$[[ monedaATexto(monto.primero) ]]</td>
+							</tr>
+							<tr>
+								<td>Segundo año</td>
+								<td>$[[ monedaATexto(monto.segundo) ]]</td>
+							</tr>
+						</tbody>
+					</table>
+				</li>
+			</ul>
+			<div class="row justify-content-center">
+				<form method="POST" id="formulario_contrato">
+					{% csrf_token %}
+					<input type="hidden" name="datos_contrato" id="datos_contrato">
+					<button type="button" class="btn btn-primary" v-on:click="guardarContrato" v-if="completo">Guardar contrato</button>
+					<button type="button" class="btn btn-primary" disabled v-else>Debe configurar todo el contrato</button>
+				</form>
+			</div>
+		</div>
+
+		<!-- FORMULARIO PROPIEDADES -->
+		<div class="col-md-8 order-md-1 formulario" id="formulario_propiedad" style="display: none">
+			<div v-if="propiedad.id">
+				<h4 class="mb-3">Propiedad seleccionada</h4>
+				<hr>
+				<table class="table table-sm table-bordered text-center">
+					<thead class="thead-dark">
+						<tr>
+							<th>Dirección</th>
+							<th>Propietario</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>[[ propiedad.direccion ]]</td>
+							<td>[[ propiedad.nombre_propietario ]]</td>
+							<td><button type="button" class="btn btn-sm btn-danger" v-on:click="quitarPropiedad">Quitar</button></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div v-else>
+				<h4 class="mb-3">Seleccionar propiedad</h4>
+				<form id="form_propiedad">
+					<div class="form-group">
+						<label for="busquedapropiedades_direccion">Dirección de la propiedad</label>
+						<input type="text" class="form-control" id="busquedapropiedades_direccion" v-on:keyup.enter="buscarPropiedades">
+					</div>
+					<div class="row">
+						<div class="col-md-6 mb-3">
+							<label for="busquedapropiedades_nombre">Apellido del propietario</label>
+							<input type="text" class="form-control" id="busquedapropiedades_nombre" v-on:keyup.enter="buscarPropiedades">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label for="busquedapropiedades_dni">D.N.I.</label>
+							<input type="text" class="form-control" id="busquedapropiedades_dni" v-on:keyup.enter="buscarPropiedades">
+						</div>
+					</div>
+					<div class="row justify-content-between">
+						<div class="col-auto"><button type="button" class="btn btn-info" v-on:click="buscarPropiedades">Buscar</button></div>
+						<div class="col-auto"><button type="button" class="btn btn-success" onclick="window.open('{% url 'cargar_propiedad' %}')">Cargar nueva</button></div>
+					</div>
+				</form>
+				<table class="table table-sm table-bordered text-center" v-if="listado_propiedades.length > 0">
+					<hr>
+					<thead class="thead-dark">
+						<tr>
+							<th>Dirección</th>
+							<th>Propietario</th>
+							<th>Seleccionar</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="propiedad in listado_propiedades">
+							<td>[[ propiedad.direccion ]]</td>
+							<td>[[ propiedad.nombre_propietario ]]</td>
+							<td>
+								<span v-if="propiedad.tiene_contrato">Tiene un contrato activo.</span>
+								<button class="btn btn-sm btn-primary" type="button" v-on:click="setPropiedad(propiedad)" v-else>Seleccionar</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- FORMULARIO INQUILINO -->
+		<div class="col-md-8 order-md-1 formulario" id="formulario_inquilino">
+			<div v-if="inquilino.dni">
+				<h4 class="mb-3">Datos del inquilino</h4>
+				<hr>
+				<table class="table table-sm table-bordered text-center">
+					<thead class="thead-dark">
+						<tr>
+							<th>DNI</th>
+							<th>Nombre</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>[[ inquilino.dni ]]</td>
+							<td>[[ inquilino.nombre ]]</td>
+							<td><button type="button" class="btn btn-sm btn-danger" v-on:click="quitarInquilino">Quitar</button></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div v-else>
+				<h4 class="mb-3">Buscar inquilino</h4>
+				<form id="form_inquilino">
+					<div class="row">
+						<div class="col-md-6 mb-3">
+							<label for="busquedainquilinos_dni">D.N.I.</label>
+							<input type="text" class="form-control" id="busquedainquilinos_dni">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label for="busquedainquilinos_nombre">Apellido</label>
+							<input type="text" class="form-control" id="busquedainquilinos_nombre">
+						</div>
+					</div>
+					<div class="mb-3">
+						<div class="row justify-content-between">
+							<div class="col-auto"><button type="submit" class="btn btn-info">Buscar</button></div>
+							<div class="col-auto"><button type="button" class="btn btn-success" onclick="window.open('{% url 'cargar_inquilino' %}')">Cargar nuevo</button></div>
+						</div>
+					</div>
+				</form>
+				<table class="table table-sm table-bordered text-center" v-if="listado_inquilinos.length > 0">
+					<hr>
+					<thead class="thead-dark">
+						<tr>
+							<th>DNI</th>
+							<th>Nombre</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="inquilino in listado_inquilinos">
+							<td>[[ inquilino.dni ]]</td>
+							<td>[[ inquilino.nombre ]]</td>
+							<td><button class="btn btn-sm btn-primary" type="button" v-on:click="setInquilino(inquilino)">Seleccionar</button></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- FORMULARIO GARANTES -->
+		<div class="col-md-8 order-md-1 formulario" id="formulario_garantes">
+			<h4 class="mb-3">Garantes</h4>
+			<form id="form_garantes" v-if="garantes.length < 6">
+				<div class="row">
+					<div class="col-md-6 mb-3">
+						<label for="busquedagarantes_dni">D.N.I.</label>
+						<input type="text" class="form-control" id="busquedagarantes_dni">
+					</div>
+					<div class="col-md-6 mb-3">
+						<label for="busquedagarantes_nombre">Apellido</label>
+						<input type="text" class="form-control" id="busquedagarantes_nombre">
+					</div>
+				</div>
+				<div class="mb-3">
+					<div class="row justify-content-between">
+						<div class="col-auto"><button type="submit" class="btn btn-info">Buscar</button></div>
+						<div class="col-auto"><button type="button" class="btn btn-success">Cargar nuevo</button></div>
+					</div>
+				</div>
+			</form>
+			<table class="table table-sm table-bordered text-center" v-if="listado_garantes.length > 0">
+				<hr class="mb-4">
+				<thead class="thead-dark">
+					<tr>
+						<th>D.N.I.</th>
+						<th>Nombre</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="persona in listado_garantes">
+						<td>[[ persona.dni ]]</td>
+						<td>[[ persona.nombre ]]</td>
+						<td><button class="btn btn-sm btn-primary" type="button" v-on:click="addGarante(persona)">Seleccionar</button></td>
+					</tr>
+				</tbody>
+			</table>
+			<div v-if="garantes.length > 0">
+				<hr class="mb-4">
+				<h3>Seleccionados</h3>
+				<table class="table table-sm table-bordered text-center">
+					<thead class="thead-dark">
+						<tr>
+							<th>D.N.I.</th>
+							<th>Nombre</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="persona in garantes">
+							<td>[[ persona.dni ]]</td>
+							<td>[[ persona.nombre ]]</td>
+							<td><button class="btn btn-sm btn-danger" type="button" v-on:click="quitarGarante(persona)">Eliminar</button></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- FORMULARIO DETALLES -->
+		<div class="col-md-8 order-md-1 formulario" id="formulario_detalles" style="display: none">
+			<h4 class="mb-3">Detalles</h4>
+			<h6>Fecha de inicio del contrato</h6>
+			<div
+				class="datepicker-here inline mb-3"
+				data-language='es'
+				data-min-view="months"
+				data-view="months"
+				data-date-format="yyyy/mm/dd" 
+				id="form_detalles_inicio"></div>
+			<button type="button" class="btn btn-primary" v-on:click="setFecha()">Guardar</button>
+		</div>
+
+		<!-- FORMULARIO MONTOS -->
+		<div class="col-md-8 order-md-1 formulario" id="formulario_montos" style="display: none">
+			<h4 class="mb-3">Montos</h4>
+			<h6>Monto a pagar durante el primer año:</h6>
+			<div class="row">
+				<div class="col-md-5"><input type="text" class="form-control" id="form_monto_1" v-on:keyup.enter="setMonto"></div>
+				<div class="col-auto"><button type="button" class="btn btn-primary" v-on:click="setMonto">Guardar</button></div>
+			</div>
+			<small>El monto a pagar del segundo año se calcula automáticamente.</small>
+		</div>
+	</div>
+	<!-- Los formularios van arriba de este /div -->
+</div>
+{% endblock cuerpo %}
+{% block javascript %}
+<script src="{% static "js/vue.js" %}"></script>
+<script src="{% static "js/datepicker.min.js" %}"></script>
+<script src="{% static "js/datepicker.es.js" %}"></script>
+<script>
+	var aviso_de_salida = true;
+	window.onbeforeunload = function() {
+		if(app.en_blanco && aviso_de_salida){
+			return "Los cambios no se guardarán";
+		}
+	}
+	var app = new Vue({
+		delimiters: ['[[', ']]'],
+		el: '#contrato',
+		data: {
+			propiedad: {direccion: 'NO SELECCIONADA', nombre_propietario: 'NO SELECCIONADO'},
+			inquilino: {nombre: 'NO SELECCIONADO'},
+			garantes: [],
+			detalles: {fecha_fin: '', fecha_inicio: ''},
+			monto: {primero: 0.00, segundo: 0.00},
+			listado_propiedades: [],
+			listado_inquilinos: [],
+			listado_garantes: []
+		},
+		computed: {
+			completo() {
+				return (this.propiedad.id && this.inquilino.dni && this.detalles.fecha_inicio != '' && this.monto.primero > 0 && this.garantes.length > 0);
+			},
+			en_blanco() {
+				return (this.propiedad.id || this.inquilino.dni || this.detalles.fecha_inicio != '' || this.monto.primero > 0)
+			}
+		},
+		methods: {
+			monedaATexto: function (moneda){
+				var txt = moneda.toFixed(2)
+				var res = txt.replace('.',',')
+				return res
+			},
+			setPropiedad: function(propiedad) {
+				this.propiedad = propiedad
+				this.listado_propiedades = []
+			},
+			setInquilino: function(inquilino) {
+				this.inquilino = inquilino
+				this.listado_inquilinos = []
+			},
+			addGarante: function(garante) {
+				var existe = false
+				this.garantes.forEach(gar => {
+					if(gar.dni == garante.dni){
+						existe = true;
+					}
+				});
+				if(!existe) {
+					this.garantes.push(garante)
+					this.listado_garantes = []
+				}
+			},
+			setFecha: function() {
+				this.detalles.fecha_inicio = new Date($('#form_detalles_inicio').val() + ' 12:00').toLocaleDateString()
+				this.detalles.fecha_fin = add2Anios($('#form_detalles_inicio').val())
+			},
+			setMonto: function(){
+				var valor_monto = parseFloat($('#form_monto_1').val().replace(',', '.'));
+				if(valor_monto > 0) {
+					this.monto.primero = valor_monto;
+					this.monto.segundo = (this.monto.primero * parseFloat("{{ incremento_anual }}"));
+				}
+				else {
+					this.monto.primero = 0.00;
+					this.monto.segundo = 0.00;
+				}
+			},
+			quitarPropiedad: function() {
+				this.propiedad = {direccion: 'NO SELECCIONADA', nombre_propietario: 'NO SELECCIONADO'}
+			},
+			quitarInquilino: function() {
+				this.inquilino = {nombre: 'NO SELECCIONADO'}
+			},
+			quitarGarante: function(garante) {
+				var index = this.garantes.indexOf(garante);
+				if (index > -1) {
+					this.garantes.splice(index, 1);
+				}
+			},
+			buscarPropiedades: function() {
+				var dni = $('#busquedapropiedades_dni').val()
+				var apellido = $('#busquedapropiedades_nombre').val()
+				var direccion = $('#busquedapropiedades_direccion').val()
+				$.ajax({
+					method: "GET",
+					url: "/ajax/propiedades",
+					data: {
+						dni: dni,
+						apellido: apellido,
+						direccion: direccion
+					}
+				}).done(function(respuesta) {
+					app.listado_propiedades = respuesta
+				})
+			},
+			guardarContrato: function() {
+				var datos = $('#datos_contrato');
+				var gars = [];
+				this.garantes.forEach(g => gars.push(g.dni));
+				datos.val(
+					JSON.stringify({
+						id_propiedad: this.propiedad.id,
+						dni_inquilino: this.inquilino.dni,
+						garantes: JSON.stringify(gars),
+						fecha_inicio: this.detalles.fecha_inicio,
+						monto: this.monto.primero
+					})
+				)
+				aviso_de_salida = false;
+				$('#formulario_contrato').submit();
+			}
+		}
+	})
+	$('#form_inquilino').on('submit', function(event) {
+		event.preventDefault()
+		var dni = $('#busquedainquilinos_dni').val()
+		var nombre = $('#busquedainquilinos_nombre').val()
+		$.ajax({
+			method: "GET",
+			url: "/ajax/inquilinos",
+			data: {
+				dni: dni,
+				nombre: nombre
+			}
+		}).done(function(respuesta) {
+			app.listado_inquilinos = respuesta
+		})
+	})
+	$('#form_garantes').on('submit', function(event) {
+		event.preventDefault()
+		var dni = $('#busquedagarantes_dni').val()
+		var nombre = $('#busquedagarantes_nombre').val()
+		$.ajax({
+			method: "GET",
+			url: "/ajax/garantes",
+			data: {
+				dni: dni,
+				nombre: nombre
+			}
+		}).done(function(respuesta) {
+			app.listado_garantes = respuesta
+		})
+	})
+	function add2Anios(date) {
+		var result = new Date(date);
+		result.setFullYear(result.getFullYear() + 2);
+		result.setDate(result.getDate() - 1);
+		return result.toLocaleDateString();
+	}
+	function seleccionoGarantes() {
+		$('.formulario').hide()
+		$('#formulario_garantes').show()
+		// esconder los otros
+	}
+	function seleccionoPropiedad() {
+		$('.formulario').hide()
+		$('#formulario_propiedad').show()
+		// esconder los otros			
+	}
+	function seleccionoInquilino() {
+		$('.formulario').hide();
+		$('#formulario_inquilino').show();
+	}
+	function seleccionoMontos() {
+		$('.formulario').hide();
+		$('#formulario_montos').show();
+	}
+	function seleccionoDetalles() {
+		var este_mes = new Date();
+		este_mes.setDate(1);
+		$('.formulario').hide();
+		$('#formulario_detalles').show();
+		$('#form_detalles_inicio').datepicker({
+			language: 'es',
+			minDate: new Date(2010),
+			autoClose: true,
+
+		}).data('datepicker').selectDate(este_mes);
+	}
+	// esconder los otros
+	seleccionoPropiedad();
+</script>
+{% endblock javascript %}

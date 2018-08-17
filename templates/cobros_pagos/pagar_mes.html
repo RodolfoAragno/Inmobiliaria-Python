@@ -1,0 +1,62 @@
+{% extends "comun.html" %}
+{% block titulo %}Pagar a propietario - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+<div class="container">
+    <div class="text-center">
+        <h2>Pagar a propietario</h2>
+        <h4>Inquilino: {{ mes.contrato.inquilino.persona.getNombreApellido }}</h4>
+        <h4>Propiedad: {{ mes.contrato.propiedad.direccion }}</h4>
+        <h4>Propietario: {{ mes.contrato.propiedad.propietario.persona.getNombreApellido }}</h4>
+        
+        {% if mes.fecha_pagado_propietario %}
+            <h5>Detalle pagado para el mes {{ texto_mes.upper }}</h5>
+            <span>Fecha de pago: {{ mes.fecha_pagado_propietario }}</span>
+        {% else %}
+            <h5>Detalle a pagar para el mes {{ texto_mes.upper }}</h5>            
+        {% endif %}
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-sm-6">
+            <table class="table table-sm table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Detalle</th>
+                        <th class="text-right">Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in mes.getDetallePropietario %}
+                    <tr>
+                        <td>{{ detalle.descripcion }}</td>
+                        <td class="text-right">${{ detalle.valor }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="segundo-anio">
+                        {% if mes.fecha_pagado_propietario %}
+                        <td>Total</td>
+                        {% else %}
+                        <td>Total</td>
+                        {% endif %}
+                        <td class="text-right">${{ mes.totalAPagar }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            {% if mes.fecha_pagado_propietario is not None %}
+                <a href="{% url 'recibo_pago' mes.contrato.id mes.id %}"><button type="button" class="btn btn-warning">Imprimir recibo</button></a>
+            {% else %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Pagar</button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'grilla' mes.contrato.id %}"><button class="btn btn-danger">Volver</button></a>
+        </div>
+    </div>
+</div>
+{% endblock cuerpo %}

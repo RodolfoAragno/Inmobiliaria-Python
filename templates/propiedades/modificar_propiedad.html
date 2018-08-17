@@ -1,0 +1,64 @@
+{% extends "comun.html" %}
+{% block titulo %}Alta propiedad - Gazze Inmobiliaria{% endblock titulo %}
+{% block cuerpo %}
+	<div class="container">
+		<div class="row">
+			<h2 class="col-auto">Modificar propiedad</h2>
+		</div>
+		{% if propiedad is None %}
+		ERROR: No se encontró la propiedad.
+		{% else %}
+		<div class="row">
+			<form class="container" method="POST">
+				{% csrf_token %}
+				<div class="form-row">
+					<div class="form-group col-md-6">
+						<label>Propietario</label>
+						<input type="text" class="form-control" value="{{ propiedad.propietario.persona.getApellidoNombre }}" readonly>
+					</div>
+					<div class="form-group col-md-6">
+						<label for="dni">DNI</label>
+						<input type="text" class="form-control" name="dni" value="{{ propiedad.propietario.persona.dni }}" readonly>
+					</div>
+
+				</div>
+				<div class="form-group">
+					<label for="direccion">Dirección</label>
+					<input type="text" class="form-control" name="direccion" value="{{ propiedad.direccion }}">
+				</div>
+				<div class="form-group">
+					<label for="descripcion">Descripción
+						<small>(Opcional)</small>
+					</label>
+					<textarea class="form-control" name="descripcion">{{ propiedad.descripcion }}</textarea>
+				</div>
+				<div class="form-row">
+					<div class="form-group col-md-6">
+						<label for="ciudad">Ciudad
+							<small>(Opcional)</small>
+						</label>
+						<input type="text" class="form-control" name="ciudad" value="{{ propiedad.ciudad }}">
+					</div>
+					<div class="form-group col-md-6">
+						<label for="provincia">Provincia
+							<small>(Opcional)</small>
+						</label>
+						<input type="text" class="form-control" name="provincia" value="{{ propiedad.provincia }}">
+					</div>
+				</div>
+				<div class="row justify-content-between">
+					<div class="col-auto">
+						<button type="submit" class="btn btn-primary">Guardar</button>
+					</div>
+					<div class="col-auto">
+						<a href="{% url 'eliminar_propiedad' propiedad.id %}"><button type="button" class="btn btn-danger">Dar de baja</button></a>
+					</div>
+				</div>
+			</form>
+		</div>
+		{% endif %}
+	</div>
+{% endblock cuerpo %}
+
+{% block javascript %}
+{% endblock javascript %}
