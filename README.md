@@ -2,13 +2,13 @@
 
 ## Correr servidor Python:
 
-* Setear `SECRET_KEY`:
+1) Setear `SECRET_KEY`:
 	* [Generar](https://www.miniwebtool.com/django-secret-key-generator/)
 	* `export SECRET_KEY=<llave>`
-* Setear `DATABASE_URL`:
+2) Setear `DATABASE_URL`:
 	* Ejemplo para Postgres:
 		* `postgres://<usuario>:<contraseña>@<host>:<puerto>/<base_de_datos>`
-* Levantar servidor web de Python.
+3) Levantar servidor web de Python.
 
 ## Configuración de nginx
 
@@ -33,6 +33,29 @@ http {
 }
 ```
 
+## Dominio
+
+Para ingresar al servidor con un dominio falso. Por ejemplo: `http://inmobiliaria.xyz`
+1) Setear IP fija en el router. Ej. `192.168.0.25`
+2) Setear IP como servidor DNS.
+3) Instalar `dnsmasq`.
+4) Configuración:
+	```
+	>>> /etc/hosts
+	<IP FIJA DEL SERVIDOR>	<nombre.xyz>
+
+	>>> /etc/dnsmasq
+	domain-needed
+	bogus-priv
+	local=/<nombre.xyz>/
+	listen-address=127.0.0.1
+	listen-address=<IP FIJA DEL SERVIDOR>
+	bind-interfaces
+	expand-hosts
+	domain=<xyz>
+	```
+
 ## Otros
 
-* Agregar key SSH de la computadora servidor en Configuración > Repositorio > Deploy keys.
+* **Permisos del repositorio:**
+	1) Agregar key SSH pública de la computadora servidor en Configuración > Repositorio > Deploy keys.

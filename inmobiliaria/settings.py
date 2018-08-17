@@ -18,7 +18,7 @@ if 'DATABASE_URL' not in os.environ:
 	raise Exception('No se ha fijado la url de la base de datos.')
 
 DEBUG = False
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'gazze.in']
 INSTALLED_APPS = [
     'django.contrib.auth',
 	'django.contrib.staticfiles',
