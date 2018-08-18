@@ -11,6 +11,7 @@ from parametros.models import Parametros
 import decimal
 
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT')
+TEMPLATES_DIR = os.environ.get('TEMPLATES_DIR')
 
 class Contrato(models.Model):
 	"""Model definition for Contrato."""
@@ -20,8 +21,8 @@ class Contrato(models.Model):
 	fecha_mitad = models.DateField(auto_now=False, auto_now_add=False)# fecha_inicio + relativedelta(years=1) - relativedelta(days=1)
 	fecha_fin = models.DateField(auto_now=False, auto_now_add=False)
 	
-	monto_primer_anio = models.DecimalField(max_digits=8, decimal_places=2) # monto fijo mensual del alquiler
-	monto_segundo_anio = models.DecimalField(max_digits=8, decimal_places=2)
+	monto_primer_anio = models.DecimalField(max_digits=12, decimal_places=2) # monto fijo mensual del alquiler
+	monto_segundo_anio = models.DecimalField(max_digits=12, decimal_places=2)
 
 	fecha_firma = models.DateField(null=True, default=None)
 	
@@ -55,7 +56,7 @@ class Contrato(models.Model):
 			)
 		for _ in range(len(garantes), 6):
 			garantes.append('')
-		document = MailMerge(os.path.join(settings.TEMPLATES_DIR, 'documentos/contrato.docx'))
+		document = MailMerge(os.path.join(TEMPLATES_DIR, 'documentos/contrato.docx'))
 		document.merge(
 			INQUILINO_NOMBRE=self.inquilino.persona.getNombreApellido().upper(),
 			INQUILINO_DNI=self.inquilino.persona.dni.__str__(),
@@ -108,7 +109,7 @@ class Contrato(models.Model):
 	
 	def generar_poder(self):
 		parametros = Parametros.cargar()
-		document = MailMerge(os.path.join(settings.TEMPLATES_DIR, 'documentos/autorizacion.docx'))
+		document = MailMerge(os.path.join(TEMPLATES_DIR, 'documentos/autorizacion.docx'))
 		document.merge(
 			FECHA_FIRMA_TEXTO=format_date(date.today(), format='long', locale='es'),
 			DNI=str(self.propiedad.propietario.persona.dni),
@@ -146,17 +147,17 @@ class MesContrato(models.Model):
 	fecha_vencimiento = models.DateField()
 
 	# monto fijo a pagar por el inquilino
-	monto = models.DecimalField(max_digits=8, decimal_places=2)
-	monto_propietario = models.DecimalField(max_digits=8, decimal_places=2)
+	monto = models.DecimalField(max_digits=12, decimal_places=2)
+	monto_propietario = models.DecimalField(max_digits=12, decimal_places=2)
 	
 	#impuestos y servicios definidos	
-	api = models.DecimalField(max_digits=8, decimal_places=2, default=None, null=True)
-	expensas = models.DecimalField(max_digits=8, decimal_places=2, default=None, null=True)
-	agua = models.DecimalField(max_digits=8, decimal_places=2, default=None, null=True)
-	tasa = models.DecimalField(max_digits=8, decimal_places=2, default=None, null=True)
-	intereses = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-	varios_propietario = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-	varios_inquilino = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+	api = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
+	expensas = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
+	agua = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
+	tasa = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
+	intereses = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+	varios_propietario = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+	varios_inquilino = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
 	fecha_pagado_propietario = models.DateField(null=True, default=None)
 	fecha_pagado_inquilino = models.DateField(null=True, default=None)
@@ -296,8 +297,15 @@ class MesContrato(models.Model):
 
 class ConceptoVario(models.Model):
 	descripcion = models.CharField(max_length=150)
-	monto = models.DecimalField(max_digits=8, decimal_places=2)
+	monto = models.DecimalField(max_digits=12, decimal_places=2)
 	a_favor = models.BooleanField(default=False)
 	para_propietario = models.BooleanField(default=False)
 
 	mes = models.ForeignKey(MesContrato, on_delete=models.DO_NOTHING, related_name='varios')
+
+	def save(self, *args, **kwargs):
+		try:
+			super().save(*args, **kwargs)
+		except:
+			if self.id is not None:
+				self.delete()

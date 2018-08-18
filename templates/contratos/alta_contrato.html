@@ -48,11 +48,11 @@
 						<tbody>
 							<tr>
 								<td>Fecha de inicio</td>
-								<td>[[ detalles.fecha_inicio ]]</td>
+								<td>[[ textoFecha(detalles.fecha_inicio) ]]</td>
 							</tr>
 							<tr>
 								<td>Fecha de fin</td>
-								<td>[[ detalles.fecha_fin ]]</td>
+								<td>[[ textoFecha(detalles.fecha_fin) ]]</td>
 							</tr>
 						</tbody>
 					</table>
@@ -335,6 +335,13 @@
 			}
 		},
 		methods: {
+			textoFecha: function (unixt) {
+				if(unixt) {
+					var fecha = new Date(unixt);
+					return `${fecha.getDate()}/${fecha.getMonth()+1}/${fecha.getFullYear()}`;
+				}
+				return '';
+			},
 			monedaATexto: function (moneda){
 				var txt = moneda.toFixed(2)
 				var res = txt.replace('.',',')
@@ -361,8 +368,8 @@
 				}
 			},
 			setFecha: function() {
-				this.detalles.fecha_inicio = new Date($('#form_detalles_inicio').val() + ' 12:00').toLocaleDateString()
-				this.detalles.fecha_fin = add2Anios($('#form_detalles_inicio').val())
+				this.detalles.fecha_inicio = new Date($('#form_detalles_inicio').val() + ' 12:00').getTime();
+				this.detalles.fecha_fin = add2Anios(this.detalles.fecha_inicio);
 			},
 			setMonto: function(){
 				var valor_monto = parseFloat($('#form_monto_1').val().replace(',', '.'));
@@ -455,7 +462,7 @@
 		var result = new Date(date);
 		result.setFullYear(result.getFullYear() + 2);
 		result.setDate(result.getDate() - 1);
-		return result.toLocaleDateString();
+		return result.getTime();
 	}
 	function seleccionoGarantes() {
 		$('.formulario').hide()

@@ -16,7 +16,7 @@
 	<form method="post">
 		{% csrf_token %}
 		<div class="form-group">
-			<label for="porcentaje_propietario">Porcentaje del monto mensual correspondiente al propietario</label>
+			<label for="porcentaje_propietario">Comisión de la inmobiliaria sobre el monto del alquiler</label>
 			<div class="input-group col-lg-4 mb-2">
 				<input class="form-control" type="text" name="porcentaje_propietario" required value="{{ parametros.porcentaje_propietario }}">
 				<div class="input-group-append">

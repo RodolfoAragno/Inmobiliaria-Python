@@ -99,7 +99,7 @@ def alta_contrato(request):
 				'error': 'La propiedad ya tiene un contrato activo.'
 			})
 		contrato.inquilino = Inquilino.objects.get(persona__dni=datos['dni_inquilino'])
-		contrato.fecha_inicio = datetime.strptime(datos['fecha_inicio'], "%d/%m/%Y")
+		contrato.fecha_inicio = date.fromtimestamp(int(datos['fecha_inicio']) / 1000);
 		contrato.monto_primer_anio = datos['monto']
 		contrato.save()
 		for dni_garante in json.loads(datos['garantes']):

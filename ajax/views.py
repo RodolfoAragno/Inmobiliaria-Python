@@ -39,7 +39,7 @@ def modificar_mes(request):
 		elif impuesto == 'varios_propietario':
 			nuevo_valor = json.loads(request.POST.get('nuevo_valor'))
 			for vario in nuevo_valor:
-				if vario['descripcion'] == '' or vario['monto'] == '':
+				if vario['descripcion'] == '' or vario['monto'] is None or vario['monto'] == '':
 					if int(vario['id']) > 0:
 						c = ConceptoVario.objects.get(pk=vario['id'])
 						c.delete()

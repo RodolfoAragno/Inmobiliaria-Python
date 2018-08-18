@@ -80,3 +80,4 @@ STATICFILES_DIRS = [
 ]
 MEDIA_ROOT = os.path.join(BASE_DIR, 'gazze_documentos')
 os.environ.setdefault('MEDIA_ROOT', MEDIA_ROOT)
+os.environ.setdefault('TEMPLATES_DIR', TEMPLATES_DIR)

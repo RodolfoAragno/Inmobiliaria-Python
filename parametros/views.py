@@ -5,18 +5,12 @@ from django.core.exceptions import ValidationError
 def parametros(request):
 	parametros = Parametros.cargar()
 	if request.method == 'POST':
-		porc_prop = request.POST.get('porcentaje_propietario', None)
-		incr_anual = request.POST.get('incremento_anual', None)
-		int_diario = request.POST.get('interes', None)
-		email_dir = request.POST.get('email_direccion', None)
-		email_asu = request.POST.get('email_asunto', None)
-		email_msj = request.POST.get('email_mensaje', None)
-		parametros.porcentaje_propietario = porc_prop
-		parametros.incremento_segundo_anio = incr_anual
-		parametros.interes_diario = int_diario
-		parametros.email_direccion = email_dir
-		parametros.email_asunto = email_asu
-		parametros.email_mensaje = email_msj
+		parametros.porcentaje_propietario = request.POST.get('porcentaje_propietario', None)
+		parametros.incremento_segundo_anio = request.POST.get('incremento_anual', None)
+		parametros.interes_diario = request.POST.get('interes', None)
+		parametros.email_direccion = request.POST.get('email_direccion', None)
+		parametros.email_asunto = request.POST.get('email_asunto', None)
+		parametros.email_mensaje = request.POST.get('email_mensaje', None)
 		try:
 			parametros.save()
 			return render(request, 'parametros/parametros.html', {
