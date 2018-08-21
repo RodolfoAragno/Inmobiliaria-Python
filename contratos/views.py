@@ -110,7 +110,6 @@ def alta_contrato(request):
 		incremento = parametros.incremento_segundo_anio + 1
 		return render(request, 'contratos/alta_contrato.html', {
 			'incremento_anual': str(incremento).replace(',', '.'),
-			'incremento_anual': str(incremento).replace(',', '.'),
 			'texto_incremento': str((incremento - 1) * 100).replace('.', ','),
 			'texto_porcentaje': str(parametros.porcentaje_propietario * 100).replace('.', ',')
 		})
