@@ -109,7 +109,10 @@ def alta_contrato(request):
 	else:
 		incremento = parametros.incremento_segundo_anio + 1
 		return render(request, 'contratos/alta_contrato.html', {
-			'incremento_anual': str(incremento).replace(',', '.')
+			'incremento_anual': str(incremento).replace(',', '.'),
+			'incremento_anual': str(incremento).replace(',', '.'),
+			'texto_incremento': str((incremento - 1) * 100).replace('.', ','),
+			'texto_porcentaje': str(parametros.porcentaje_propietario * 100).replace('.', ',')
 		})
 
 def firmar_contrato(request, id_contrato):
@@ -172,12 +175,12 @@ def enviar_email(request, id_contrato, id_mes):
 			adress_inquilino = email_inquilino.split('@')
 		email_asunto = request.POST.get('asunto')
 		email_mensaje = request.POST.get('cuerpo')
-		email_contraseña = request.POST.get('contrasenia')
 		email_detalle = request.POST.get('detalle')
 		email_inmobiliaria = parametros.email_direccion.split('@')
+		email_contrasenia = parametros.email_contrasenia
 
 		try:
-			conn = open_connection(parametros.email_direccion, email_contraseña)
+			conn = open_connection(parametros.email_direccion, email_contrasenia)
 			msg = EmailMessage()
 			msg['Subject'] = email_asunto
 			msg['From'] = Address("Gazze Inmobiliaria", email_inmobiliaria[0], email_inmobiliaria[1])

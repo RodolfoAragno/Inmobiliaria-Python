@@ -50,6 +50,17 @@
 			</div>
 		</div>
 		<div class="form-group">
+			<label for="email_contrasenia">Contraseña del email de la inmobiliaria</label>
+			<div class="col-auto">
+				{% if parametros.email_contrasenia %}
+				<input type="password" class="form-control" name="email_contrasenia">
+				<small>Ya ha sido guardada. Dejar en blanco para mantener la actual.</small>
+				{% else %}
+				<input type="password" class="form-control" name="email_contrasenia" required>
+				{% endif %}
+			</div>
+		</div>
+		<div class="form-group">
 			<label for="email_asunto">Asunto</label>
 			<div class="col-auto">
 				<input type="text" class="form-control" name="email_asunto" value="{{ parametros.email_asunto }}" required>

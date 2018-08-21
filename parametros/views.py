@@ -11,13 +11,23 @@ def parametros(request):
 		parametros.email_direccion = request.POST.get('email_direccion', None)
 		parametros.email_asunto = request.POST.get('email_asunto', None)
 		parametros.email_mensaje = request.POST.get('email_mensaje', None)
+		contr = request.POST.get('email_contrasenia', None)
+		if contr is not None and contr != '':
+			parametros.email_contrasenia = contr
+
 		try:
 			parametros.save()
+			parametros.porcentaje_propietario *= 100
+			parametros.incremento_segundo_anio *= 100
+			parametros.interes_diario *= 100
 			return render(request, 'parametros/parametros.html', {
 				'parametros': parametros,
 				'guardado': True
 			})
 		except ValidationError as err:
+			parametros.porcentaje_propietario *= 100
+			parametros.incremento_segundo_anio *= 100
+			parametros.interes_diario *= 100
 			return render(request, 'parametros/parametros.html', {
 				'parametros': parametros,
 				'error': err

@@ -296,7 +296,11 @@
 				<div class="col-md-5"><input type="text" class="form-control" id="form_monto_1" v-on:keyup.enter="setMonto"></div>
 				<div class="col-auto"><button type="button" class="btn btn-primary" v-on:click="setMonto">Guardar</button></div>
 			</div>
-			<small>El monto a pagar del segundo año se calcula automáticamente.</small>
+			<small>El monto a pagar del segundo año se calcula automáticamente.</small><br>
+			<ul>
+				<li>Incremento anual: {{ texto_incremento }}%.</li>
+				<li>Comisión correspondiente a la inmobiliaria: {{ texto_porcentaje }}%.</li>
+			</ul>
 		</div>
 	</div>
 	<!-- Los formularios van arriba de este /div -->

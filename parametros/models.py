@@ -11,6 +11,7 @@ class Parametros(models.Model):
 	email_direccion = models.EmailField()
 	email_asunto = models.CharField(max_length=150)
 	email_mensaje = models.TextField()
+	email_contrasenia = models.CharField(max_length=50)
 
 	def save(self, *args, **kwargs):
 		if Parametros.objects.exists() and not self.pk:
