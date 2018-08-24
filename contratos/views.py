@@ -13,6 +13,7 @@ import json
 import smtplib
 from email.message import EmailMessage
 from email.headerregistry import Address
+from urllib.parse import quote
 
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT')
 
@@ -142,7 +143,7 @@ def descargar_documento(request, id_contrato):
 		contrato.generar_documento()
 	with open(dir_guardado, 'rb') as fh:
 		response = HttpResponse(fh.read(), content_type="application/vnd.ms-word")
-		response['Content-Disposition'] = 'inline; filename=' + os.path.basename(dir_guardado)
+		response['Content-Disposition'] = 'inline; filename=' + quote(os.path.basename(dir_guardado))
 		return response
 
 def descargar_autorizacion(request, id_contrato):
@@ -154,7 +155,7 @@ def descargar_autorizacion(request, id_contrato):
 		contrato.generar_poder()
 	with open(dir_guardado, 'rb') as fh:
 		response = HttpResponse(fh.read(), content_type="application/vnd.ms-word")
-		response['Content-Disposition'] = 'inline; filename=' + os.path.basename(dir_guardado)
+		response['Content-Disposition'] = 'inline; filename=' + quote(os.path.basename(dir_guardado))
 		return response
 
 
