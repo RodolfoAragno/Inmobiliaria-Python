@@ -39,7 +39,7 @@ class Contrato(models.Model):
 			self.fecha_fin = self.fecha_inicio + relativedelta(years=2) - relativedelta(days=1)
 			self.fecha_mitad = self.fecha_inicio + relativedelta(years=1) - relativedelta(days=1)
 		# calcula monto del 2do año
-		self.monto_segundo_anio = self.monto_primer_anio * parametros.incremento_segundo_anio
+		self.monto_segundo_anio = self.monto_primer_anio + self.monto_primer_anio * parametros.incremento_segundo_anio
 		super().save(*args, **kwargs)
 	
 	def generar_documento(self):
@@ -164,17 +164,15 @@ class MesContrato(models.Model):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		#Mantener los intereses actualizados
-		param = Parametros.cargar()
-		if self.id != None: self.calcular_intereses()
-		else self.monto_propietario = self.monto - self.monto * decimal.Decimal(param.porcentaje_propietario).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
-		
-	
-
-	def save(self, creando=False):
-		if not creando:
+		if self.id is not None:
 			self.calcular_intereses()
-		#self.monto_propietario = self.monto - self.monto * decimal.Decimal(0.20).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
+	
+	def save(self, creando=False):
+		if self.id is not None:
+			self.calcular_intereses()
+		if creando:
+			params = Parametros.cargar()
+			self.monto_propietario = (self.monto - self.monto * params.porcentaje_propietario).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
 		super().save()
 
 	def a_diccionario(self):
