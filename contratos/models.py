@@ -162,10 +162,19 @@ class MesContrato(models.Model):
 	fecha_pagado_propietario = models.DateField(null=True, default=None)
 	fecha_pagado_inquilino = models.DateField(null=True, default=None)
 
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		#Mantener los intereses actualizados
+		param = Parametros.cargar()
+		if self.id != None: self.calcular_intereses()
+		else self.monto_propietario = self.monto - self.monto * decimal.Decimal(param.porcentaje_propietario).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
+		
+	
+
 	def save(self, creando=False):
 		if not creando:
 			self.calcular_intereses()
-		self.monto_propietario = self.monto - self.monto * decimal.Decimal(0.20).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
+		#self.monto_propietario = self.monto - self.monto * decimal.Decimal(0.20).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
 		super().save()
 
 	def a_diccionario(self):
