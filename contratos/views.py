@@ -8,12 +8,14 @@ from dateutil.relativedelta import relativedelta
 from django.http import HttpResponse
 from babel.dates import format_date
 from num2words import num2words
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from urllib.parse import quote
+from email.utils import formataddr
+from email.header import Header
 import os
 import json
 import smtplib
-from email.message import EmailMessage
-from email.headerregistry import Address
-from urllib.parse import quote
 
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT')
 
@@ -170,21 +172,18 @@ def enviar_email(request, id_contrato, id_mes):
 		return render(request, 'error/parametros.html')
 	if request.method == 'POST':
 		email_inquilino = request.POST.get('email_inquilino')
-		if email_inquilino is not None:
-			adress_inquilino = email_inquilino.split('@')
 		email_asunto = request.POST.get('asunto')
 		email_mensaje = request.POST.get('cuerpo')
 		email_detalle = request.POST.get('detalle')
-		email_inmobiliaria = parametros.email_direccion.split('@')
 		email_contrasenia = parametros.email_contrasenia
 
 		try:
 			conn = open_connection(parametros.email_direccion, email_contrasenia)
-			msg = EmailMessage()
+			msg = MIMEMultipart('alternative')
 			msg['Subject'] = email_asunto
-			msg['From'] = Address("Gazze Inmobiliaria", email_inmobiliaria[0], email_inmobiliaria[1])
-			msg['To'] = (Address(mes.contrato.inquilino.persona.getNombreApellido(), adress_inquilino[0], adress_inquilino[1]))
-			msg.set_content("""\
+			msg['From'] = str(Header(formataddr(("Gazze Inmobiliaria", parametros.email_direccion))))
+			msg['To'] = str(Header(formataddr((mes.contrato.inquilino.persona.getNombreApellido(), email_inquilino))))
+			html = """\
 			<html>
 				<head></head>
 				<body>
@@ -192,8 +191,15 @@ def enviar_email(request, id_contrato, id_mes):
 					{}
 				</body>
 			</html>
-			""".format(email_mensaje, email_detalle), subtype='html')
-			conn.send_message(msg)
+			""".format(email_mensaje, email_detalle)
+			text = "{}\nDetalle\tMonto\n".format(email_mensaje)
+			for detalle in mes.getDetalle():
+				text += '{}\t${}\n'.format(detalle['descripcion'], str(detalle['valor']).replace('.', ','))
+			part1 = MIMEText(text, 'plain')
+			part2 = MIMEText(html, 'html')
+			msg.attach(part1)
+			msg.attach(part2)
+			conn.sendmail(parametros.email_direccion, email_inquilino, msg.as_string())
 		except smtplib.SMTPAuthenticationError:
 			return render(request, 'cobros_pagos/email.html', {
 				'mes': mes,
