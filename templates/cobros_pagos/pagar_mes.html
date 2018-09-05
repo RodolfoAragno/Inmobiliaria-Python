@@ -48,10 +48,10 @@
             {% if mes.fecha_pagado_propietario is not None %}
                 <a href="{% url 'recibo_pago' mes.contrato.id mes.id %}"><button type="button" class="btn btn-warning">Imprimir recibo</button></a>
             {% else %}
-            <form method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary">Pagar</button>
-            </form>
+			<form method="post" id="formulario">
+				{% csrf_token %}
+				<button type="button" class="btn btn-primary" onclick="botonEnviar()">Pagar</button>
+			</form>
             {% endif %}
         </div>
         <div class="col-auto">
@@ -60,3 +60,12 @@
     </div>
 </div>
 {% endblock cuerpo %}
+{% block javascript %}
+<script>
+	function botonEnviar() {
+		if(confirm('Confirmar operación')) {
+			$('#formulario').submit();
+		}
+	}
+</script>
+{% endblock javascript %}

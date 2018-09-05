@@ -13,7 +13,7 @@
     <div class="container">
         <div class="row justify-content-center">
     <div class="invoice-box">
-        <table cellpadding="0" cellspacing="0">
+        <table cellpadding="0" cellspacing="0" style="margin-bottom: 10em;">
             <tr class="top">
                 <td colspan="2">
                     <table>
@@ -21,9 +21,7 @@
                             <td class="title text-center">
 								<img src="{% static "img/logo-inv.png" %}" style="width:150px; margin-bottom: 5px;"><br>
                                 Salta 2862 - Santa Fe, Argentina<br>
-                                Tel: 0342 4563711<br>
-                                Cel: 0342 154789850<br>
-								gazzeinmobiliaria@gmail.com
+                                Tel: 0342 4563711
                             </td>
 							<td class="title">
 								<br>
@@ -72,12 +70,6 @@
                    Total: ${{ mes.totalAPagar }}.-
                 </td>
 			</tr>
-			<tr class="firma">
-				<td>
-					{{ mes.contrato.propiedad.propietario.persona.getNombreApellido.upper }}<br>
-					D.N.I.: {{ mes.contrato.propiedad.propietario.persona.dni }}
-				</td>
-			</tr>
         </table>
         <hr class="m-5">
 
@@ -93,9 +85,7 @@
                             <td class="title text-center">
 								<img src="{% static "img/logo-inv.png" %}" style="width:150px; margin-bottom: 5px;"><br>
                                 Salta 2862 - Santa Fe, Argentina<br>
-                                Tel: 0342 4563711<br>
-                                Cel: 0342 154789850<br>
-								gazzeinmobiliaria@gmail.com
+                                Tel: 0342 4563711
                             </td>
 							<td class="title">
 								<br>

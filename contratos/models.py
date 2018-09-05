@@ -109,22 +109,37 @@ class Contrato(models.Model):
 	
 	def generar_poder(self):
 		parametros = Parametros.cargar()
+		domicilio = None
+		if self.propiedad.propietario.persona.direccion and self.propiedad.propietario.persona.direccion != '':
+			domicilio = ', domiciliado/a en calle ' + self.propiedad.propietario.persona.direccion
+		ciudad = None
+		if self.propiedad.propietario.persona.ciudad and self.propiedad.propietario.persona.ciudad != '':
+			ciudad = ', de la Ciudad de ' + self.propiedad.propietario.persona.ciudad
+		provincia = None
+		if self.propiedad.propietario.persona.provincia and self.propiedad.propietario.persona.provincia != '':
+			provincia = ', Provincia de ' + self.propiedad.propietario.persona.provincia
+		telefono = None
+		if self.propiedad.propietario.persona.telefono and self.propiedad.propietario.persona.telefono != '':
+			telefono = ', Teléfono Nro.: ' + self.propiedad.propietario.persona.telefono
+		descrip = None
+		if self.propiedad.descripcion and self.propiedad.descripcion != '':
+			descrip = ' compuesta de: ' + self.propiedad.descripcion
 		document = MailMerge(os.path.join(TEMPLATES_DIR, 'documentos/autorizacion.docx'))
 		document.merge(
 			FECHA_FIRMA_TEXTO=format_date(date.today(), format='long', locale='es'),
 			DNI=str(self.propiedad.propietario.persona.dni),
-			DOMICILIO=self.propiedad.propietario.persona.direccion,
-			CIUDAD=self.propiedad.propietario.persona.ciudad,
-			PROVINCIA=self.propiedad.propietario.persona.provincia,
-			TELEFONO=self.propiedad.propietario.persona.telefono,
-			CELULAR='',
+			DOMICILIO=domicilio,
+			CIUDAD=ciudad,
+			PROVINCIA=provincia,
+			TELEFONO=telefono,
 			PROPIEDAD_DIRECCION=self.propiedad.direccion,
 			PROPIEDAD_CIUDAD=self.propiedad.ciudad,
 			PROPIEDAD_PROVINCIA=self.propiedad.provincia,
 			PROPIEDAD_DESCRIPCION=self.propiedad.descripcion,
 			IMPORTE_MENSUAL=str(self.monto_primer_anio),
-			IMPORTE_PROPIETARIO=str(self.monto_primer_anio * parametros.porcentaje_propietario),
-			IMP_EXPENSAS='',
+			IMPORTE_PROPIETARIO=str((self.monto_primer_anio - self.monto_primer_anio * parametros.porcentaje_propietario).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)),
+			IMPORTE_MENSUAL_2=str(self.monto_segundo_anio),
+			IMPORTE_PROPIETARIO_2=str((self.monto_segundo_anio - self.monto_segundo_anio * parametros.porcentaje_propietario).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)),
 			PLAZO=str((self.fecha_fin - self.fecha_inicio).days)
 		)
 		dir_guardado = os.path.join(MEDIA_ROOT, 'documentos/contratos/')

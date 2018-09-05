@@ -50,6 +50,7 @@ def cobrar(request, id_contrato, id_mes):
 		mes.save()
 		return redirect(cobrar, id_contrato, id_mes)
 	else:
+		mes.save()
 		return render(request, 'cobros_pagos/cobrar_mes.html', {
 			'mes': mes,
 			'texto_mes': format_date(mes.fecha_vencimiento, format='MMMM yyyy',locale='es'),
@@ -139,8 +140,7 @@ def descargar_documento(request, id_contrato):
 	dir_guardado = os.path.join(MEDIA_ROOT, 'documentos/contratos/', '{}_{}_{}.docx'.format(
 		contrato.id, contrato.inquilino.persona.apellido, contrato.propiedad.propietario.persona.apellido)
 	)
-	if contrato.fecha_firma is None or not os.path.isfile(dir_guardado):
-		contrato.generar_documento()
+	contrato.generar_documento()
 	with open(dir_guardado, 'rb') as fh:
 		response = HttpResponse(fh.read(), content_type="application/vnd.ms-word")
 		response['Content-Disposition'] = 'inline; filename=' + quote(os.path.basename(dir_guardado))
@@ -151,8 +151,7 @@ def descargar_autorizacion(request, id_contrato):
 	dir_guardado = os.path.join(MEDIA_ROOT, 'documentos/contratos/', 'autorizacion_{}_{}.docx'.format(
 		contrato.propiedad.propietario.persona.apellido, contrato.propiedad.direccion)
 	)
-	if contrato.fecha_firma is None or not os.path.isfile(dir_guardado):
-		contrato.generar_poder()
+	contrato.generar_poder()
 	with open(dir_guardado, 'rb') as fh:
 		response = HttpResponse(fh.read(), content_type="application/vnd.ms-word")
 		response['Content-Disposition'] = 'inline; filename=' + quote(os.path.basename(dir_guardado))
