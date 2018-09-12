@@ -140,7 +140,7 @@ class Contrato(models.Model):
 			IMPORTE_PROPIETARIO=str((self.monto_primer_anio - self.monto_primer_anio * parametros.porcentaje_propietario).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)),
 			IMPORTE_MENSUAL_2=str(self.monto_segundo_anio),
 			IMPORTE_PROPIETARIO_2=str((self.monto_segundo_anio - self.monto_segundo_anio * parametros.porcentaje_propietario).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)),
-			PLAZO=str((self.fecha_fin - self.fecha_inicio).days)
+			PLAZO=str((self.fecha_fin - self.fecha_inicio).days) + ' días'
 		)
 		dir_guardado = os.path.join(MEDIA_ROOT, 'documentos/contratos/')
 		if not os.path.exists(dir_guardado):
