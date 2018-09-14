@@ -106,9 +106,6 @@ def alta_contrato(request):
 		contrato.fecha_inicio = date.fromtimestamp(int(datos['fecha_inicio']) / 1000);
 		contrato.monto_primer_anio = datos['monto']
 		contrato.save()
-		for dni_garante in json.loads(datos['garantes']):
-			contrato.garantes.add(Persona.objects.get(pk=dni_garante))
-		contrato.save()
 		return redirect('ver_contrato', contrato.id)
 	else:
 		incremento = parametros.incremento_segundo_anio + 1

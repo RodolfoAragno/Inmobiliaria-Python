@@ -13,6 +13,7 @@
 			</form>
 			{% else %}
 			<form class="container" method="POST" id="cargar_form">
+				<h2>Cargar nuevo inqulino</h2>
 				{% csrf_token %}
 				<div class="form-row">
 					<div class="form-group col-md-4">
@@ -61,8 +62,12 @@
 	{% endif %}
 	$('#busqueda_form').submit(function(event){
 		event.preventDefault();
-		if( $('#busqueda_dni').val() != "") {
-			var url = "{% url 'cargar_inquilino' %}/" + $('#busqueda_dni').val()
+		let dni = parseInt($('#busqueda_dni').val().replace(/\./g,''))
+		if( isNaN(dni) ) {
+			alert("No ingresó un DNI correcto.")
+		}
+		else {
+			var url = "{% url 'cargar_inquilino' %}/" + dni
 			window.location = url
 			return;
 		}

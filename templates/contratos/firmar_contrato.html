@@ -38,7 +38,8 @@
 	$('#fecha_firma').datepicker({
 		language: 'es',
 		minDate: new Date(2010),
-		autoClose: true
+		autoClose: true,
+		toggleSelected: false
 	})
 	var myDatepicker = $('#fecha_firma').datepicker().data('datepicker');
 	myDatepicker.selectDate(new Date())

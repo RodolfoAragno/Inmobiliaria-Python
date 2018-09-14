@@ -43,19 +43,7 @@ class Contrato(models.Model):
 		super().save(*args, **kwargs)
 	
 	def generar_documento(self):
-		texto_garantes = ''
-		garantes = []
-		for garante in self.garantes.all():
-			garantes.append(garante.getNombreApellido().upper())
-			texto_garantes += "El/la señor/a {}, D.N.I. {}, domiciliado/a en calle {}, ciudad de {}, Provincia de {};".format(
-				garante.getNombreApellido().upper(),
-				garante.dni.__str__(),
-				garante.direccion,
-				garante.ciudad,
-				garante.provincia
-			)
-		for _ in range(len(garantes), 6):
-			garantes.append('')
+		texto_garantes = "El/la señor/a NOMBRE, D.N.I. DNI, domiciliado/a en calle DOMICILIO, ciudad de Santa Fe, Provincia de Santa Fe"
 		document = MailMerge(os.path.join(TEMPLATES_DIR, 'documentos/contrato.docx'))
 		document.merge(
 			INQUILINO_NOMBRE=self.inquilino.persona.getNombreApellido().upper(),
@@ -72,12 +60,11 @@ class Contrato(models.Model):
 			GARANTES=texto_garantes,
 			CONTRATO_FECHA_FIRMA=format_date(self.fecha_firma, format='long', locale='es'),
 			FIRMAS_INQUILINO=self.inquilino.persona.getNombreApellido().upper(),
-			GARANTE1_NOMBRE=garantes[0],
-			GARANTE2_NOMBRE=garantes[1],
-			GARANTE3_NOMBRE=garantes[2],
-			GARANTE4_NOMBRE=garantes[3],
-			GARANTE5_NOMBRE=garantes[4],
-			GARANTE6_NOMBRE=garantes[5],
+			GARANTE1_NOMBRE="GARANTE 1",
+			GARANTE2_NOMBRE="GARANTE 2",
+			GARANTE3_NOMBRE="GARANTE 3",
+			GARANTE4_NOMBRE="GARANTE 4",
+			GARANTE5_NOMBRE="GARANTE 5",
 		)
 		dir_guardado = os.path.join(MEDIA_ROOT, 'documentos/contratos/')
 		if not os.path.exists(dir_guardado):

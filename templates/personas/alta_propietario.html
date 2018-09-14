@@ -90,8 +90,12 @@
 <script>
 	$('#busqueda_form').submit(function(event){
 		event.preventDefault();
-		if( parseInt($('#busqueda_dni').val()) > 0) {
-			var url = "{% url 'cargar_propietario' %}/" + $('#busqueda_dni').val()
+		let dni = parseInt($('#busqueda_dni').val().replace(/\./g,''))
+		if( isNaN(dni) ) {
+			alert("No ingresó un DNI correcto.")
+		}
+		else {
+			var url = "{% url 'cargar_propietario' %}/" + dni
 			window.location = url
 			return;
 		}

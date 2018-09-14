@@ -6,5 +6,4 @@ urlpatterns = [
 	path('meses/<int:id_contrato>', views.meses_contrato),
 	path('propiedades', views.propiedades),
 	path('inquilinos', views.inquilinos),
-	path('garantes', views.garantes),
 ]

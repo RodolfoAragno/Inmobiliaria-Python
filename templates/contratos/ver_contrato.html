@@ -16,7 +16,7 @@
         <h5>Inquilino: <a href="{% url 'ver_inquilino' contrato.inquilino.persona.dni %}">{{ contrato.inquilino.persona.getApellidoNombre }}</a></h5>
         <div class="row justify-content-center mb-2">
             {% if contrato.fecha_firma is None or contrato.fecha_firma == '' %}
-            <div class="col-auto"><a href="{% url 'firmar_contrato' contrato.id %}"><button class="btn btn-small btn-info">Contrato firmado</button></a></div>
+            <div class="col-auto"><a href="{% url 'firmar_contrato' contrato.id %}"><button class="btn btn-small btn-info">Fecha de firma</button></a></div>
             {% else %}
             <div class="col-auto"><a href="{% url 'grilla' contrato.id %}"><button class="btn btn-small btn-success">Facturación</button></a></div>
             {% endif %}
@@ -32,28 +32,6 @@
         <h4 class="mt-3">Segundo período</h4>
         <h6><strong>{{ contrato.fecha_mitad }}</strong> al <strong>{{ contrato.fecha_fin }}</strong></h6>
         <h6>Monto mensual del alquiler: ${{ contrato.monto_segundo_anio }}</h6>
-        <hr>
-        <h2 class="mt-3">Garantes</h2>
-        <table class="table table-sm table-bordered text-center">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Nombre</th>
-                    <th>DNI</th>
-                    <th>Email</th>
-                    <th>Teléfono</th>
-                </tr>
-            </thead>
-            <tbody id="tabla_inquilinos">
-                {% for garante in contrato.garantes.all %}
-                <tr>
-                    <td>{{ garante.getApellidoNombre }}</td>
-                    <td>{{ garante.dni }}</td>
-                    <td>{{ garante.email }}</td>
-                    <td>{{ garante.telefono }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
 {% endif %}
 {% endblock cuerpo %}

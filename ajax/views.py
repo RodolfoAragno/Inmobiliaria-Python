@@ -127,23 +127,3 @@ def inquilinos(request):
 		}
 		resultado.append(i)
 	return JsonResponse(resultado, safe=False)
-
-def garantes(request):
-	dni = request.GET.get('dni')
-	nombre = request.GET.get('nombre')
-	resultado = []
-	if dni != '' and nombre != '':
-		pers = Persona.objects.filter(dni=dni).filter(apellido__icontains=nombre)
-	elif dni != '':
-		pers = Persona.objects.filter(dni=dni)
-	elif nombre != '':
-		pers = Persona.objects.filter(apellido__icontains=nombre)
-	else:
-		return JsonResponse(resultado, safe=False)
-	for persona in pers:
-		i = {
-			'dni': persona.dni,
-			'nombre': persona.getApellidoNombre()
-		}
-		resultado.append(i)
-	return JsonResponse(resultado, safe=False)
