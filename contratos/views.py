@@ -179,7 +179,7 @@ def enviar_email(request, id_contrato, id_mes):
 			msg = MIMEMultipart('alternative')
 			msg['Subject'] = email_asunto
 			msg['From'] = str(Header(formataddr(("Gazze Inmobiliaria", parametros.email_direccion))))
-			msg['To'] = str(Header(formataddr((mes.contrato.inquilino.persona.getNombreApellido(), email_inquilino))))
+			msg['To'] = email_inquilino
 			html = """\
 			<html>
 				<head></head>
