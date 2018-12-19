@@ -8,12 +8,12 @@
 <body>
     <div class="row justify-content-center no-print">
 		<div class="col-auto"><a href="{% url 'pagar' mes.contrato.id mes.id %}"><button class="btn btn-danger">Volver</button></a></div>
-		<div class="col-auti"><button class="btn btn-success" onclick="window.print();">Imprimir recibos</button></div>
+		<div class="col-auto"><button class="btn btn-success" onclick="window.print();">Imprimir recibos</button></div>
     </div>
-    <div class="container">
-        <div class="row justify-content-center">
+    <div class="container recibos">
+        <div class="row justify-content-center recibo">
     <div class="invoice-box">
-        <table cellpadding="0" cellspacing="0" style="margin-bottom: 10em;">
+        <table cellpadding="0" cellspacing="0">
             <tr class="top">
                 <td colspan="2">
                     <table>
@@ -21,9 +21,9 @@
                             <td class="title text-center">
 								<img src="{% static "img/logo-inv.png" %}" style="width:150px; margin-bottom: 5px;"><br>
                                 Salta 2862 - Santa Fe, Argentina<br>
-                                Email: gazzeinmobiliaria@gmail.com<br>
-                                Web: gazzeinmobiliaria.com<br>
-                                Tel: 0342 4563711<br>
+                                gazzeinmobiliaria@gmail.com<br>
+                                gazzeinmobiliaria.com<br>
+                                (0342) 4563711<br>
                             </td>
 							<td class="title">
 								<br>
@@ -73,12 +73,16 @@
                 </td>
 			</tr>
         </table>
-        <hr class="m-5">
+    </div>
+    </div>
 
 
         <!-- DUPLICADO -->
 
 
+
+        <div class="row justify-content-center recibo">
+            <div class="invoice-box">
 		<table cellpadding="0" cellspacing="0">
             <tr class="top">
                 <td colspan="2">
@@ -87,9 +91,9 @@
                             <td class="title text-center">
 								<img src="{% static "img/logo-inv.png" %}" style="width:150px; margin-bottom: 5px;"><br>
                                 Salta 2862 - Santa Fe, Argentina<br>
-                                Email: gazzeinmobiliaria@gmail.com<br>
-                                Web: gazzeinmobiliaria.com<br>
-                                Tel: 0342 4563711<br>
+                                gazzeinmobiliaria@gmail.com<br>
+                                gazzeinmobiliaria.com<br>
+                                (0342) 4563711<br>
                             </td>
 							<td class="title">
 								<br>
