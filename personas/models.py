@@ -4,18 +4,18 @@ from django.core.validators import MinValueValidator
 class Persona(models.Model):
 	# Atributos obligatorios
 	dni = models.IntegerField(primary_key=True, verbose_name='DNI', validators=[MinValueValidator(0)])
-	nombre = models.CharField(max_length=50, default='')
-	apellido = models.CharField(max_length=50, default='')
+	nombre = models.CharField(max_length=70, default='')
+	apellido = models.CharField(max_length=70, default='')
 	
 	# Atributos opcionales
-	email = models.EmailField(max_length=254, blank=True, default='')
-	telefono = models.CharField(max_length=25, blank=True, default='')
-	direccion = models.CharField(max_length=254, blank=True, default='')
+	email = models.CharField(max_length=512, blank=True, default='')
+	telefono = models.CharField(max_length=55, blank=True, default='')
+	direccion = models.CharField(max_length=554, blank=True, default='')
 	
 	# Para garantes:
 	ciudad = models.CharField(max_length=50, blank=True, default='Santa Fe')
 	provincia = models.CharField(max_length=50, blank=True, default='Santa Fe')
-	nacionalidad = models.CharField(max_length=35, blank=True, default='Argentino/a')
+	nacionalidad = models.CharField(max_length=55, blank=True, default='Argentino/a')
 	
 	class Meta:
 		"""Meta definition for Persona."""
