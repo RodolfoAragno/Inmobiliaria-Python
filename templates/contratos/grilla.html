@@ -11,6 +11,9 @@
             Propietario:
             <strong>{{ contrato.propiedad.propietario.persona.getNombreApellido }}</strong> - Inquilino:
             <strong>{{ contrato.inquilino.persona.getNombreApellido }}</strong>.
+			{% if not contrato.activo %}
+			<div class="text-danger">El contrato no está activo. No se pueden relizar modificaciones.</div>
+			{% endif %}
         </div>
     </div>
 	<table class="table table-bordered text-center">
@@ -73,14 +76,22 @@
 			<td>$[[ monedaATexto(mes.intereses) ]]</td>
 			<td v-bind:class="{ 'bg-pagado': mes.pagado_inquilino, 'bg-no-pagado': mes.intereses > 0 && !mes.pagado_inquilino }">
 				<button class="btn btn-primary btn-sm" v-if="mes.pagado_inquilino" v-on:click="cobrarInquilino(mes)">Ver</button>
+				{% if contrato.activo %}
 				<button class="btn btn-primary btn-sm" v-else v-bind:disabled="!puedePagar(index, mes)" v-on:click="cobrarInquilino(mes)">
 					Cobrar
 					<div v-if="puedePagar(index, mes)">($[[ totalAPagar(mes) ]])</div>
 				</button>
+				{% else %}
+				No pagado
+				{% endif %}
 			</td>
 			<td v-bind:class="{ 'bg-pagado': mes.pagado_propietario }">
 				<button class="btn btn-primary btn-sm" v-if="mes.pagado_propietario" v-on:click="cobrarPropietario(mes)">Ver</button>
+				{% if contrato.activo %}
 				<button class="btn btn-primary btn-sm" v-else  v-on:click="cobrarPropietario(mes)">Pagar<br>($[[ totalPropietario(mes) ]])</button>
+				{% else %}
+				No pagado
+				{% endif %}
 			</td>
 		</tr>
 	</table>

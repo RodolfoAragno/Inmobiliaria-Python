@@ -19,7 +19,7 @@
 			<a href="{% url 'modificar_inquilino' inquilino.persona.dni %}"><button class="btn btn-small btn-info">Editar información</button></a>
 			<hr>
 			<h2 class="mt-4">Contratos activos</h2>
-			{% if contratos %}
+			{% if contratos_activos %}
 			<table class="table table-bordered table-sm">
 				<thead class="thead-dark">
 					<th>Propiedad</th>
@@ -28,7 +28,7 @@
 					<th></th>
 				</thead>
 				<tbody>
-					{% for contrato in contratos %}
+					{% for contrato in contratos_activos %}
 					<tr>
 						<td>{{ contrato.propiedad.direccion }}</td>
 						<td>{{ contrato.fecha_inicio }}</td>
@@ -50,6 +50,56 @@
 			{% else %}
 			<h6>No cuenta con contratos activos.</h6>
 			{% endif %}
+			<hr>
+			<h2 class="mt-4">Contratos inactivos <button class="btn btn-primary" type="button" id="buttonInactivos">Mostrar</button></h2>
+			<div id="tableInactivos" class="d-none">
+			{% if contratos_inactivos %}
+			<table class="table table-bordered table-sm">
+				<thead class="thead-dark">
+					<th>Propiedad</th>
+					<th>Inquilino</th>
+					<th>Fecha de inicio</th>
+					<th>Fecha de finalización</th>
+					<th></th>
+				</thead>
+				<tbody>
+					{% for contrato in contratos_inactivos %}
+					<tr>
+						<td>{{ contrato.propiedad.direccion }}</td>
+						<td>{{ contrato.inquilino.persona.getApellidoNombre }}</td>
+						<td>{{ contrato.fecha_inicio }}</td>
+						<td>{{ contrato.fecha_fin }}</td>
+						<td>
+							<a href="{% url 'ver_contrato' contrato.id %}"><button type="button" class="btn btn-sm btn-primary">Ver contrato</button></a>
+							{% if contrato.fecha_firma %}
+							<a href="{% url 'grilla' contrato.id %}">
+								<button type="button" class="btn btn-sm btn-success">Facturación</button>
+							</a>
+							{% endif %}
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			{% else %}
+			<h6>No cuenta con contratos inactivos.</h6>
+			{% endif %}
+			</div>
 		</div>
 	{% endif %}
 {% endblock cuerpo %}
+{% block javascript %}
+<script>
+	const botonInactivos = document.getElementById("buttonInactivos");
+	botonInactivos.addEventListener("click", function() {
+		const tabla = document.getElementById("tableInactivos");
+		if (tabla.classList.contains("d-none")) {
+			tabla.classList.remove("d-none");
+			botonInactivos.textContent = "Ocultar";
+		} else {
+			tabla.classList.add("d-none");
+			botonInactivos.textContent = "Mostrar";
+		}
+	});
+</script>
+{% endblock javascript %}

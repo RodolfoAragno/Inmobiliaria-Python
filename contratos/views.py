@@ -76,20 +76,21 @@ def grilla(request, id_contrato):
 	parametros = Parametros.cargar()
 	if parametros.id is None:
 		return render(request, 'error/parametros.html')
-	contrato = Contrato.objects.get(pk=id_contrato)
+	contrato = Contrato.objects.prefetch_related().get(pk=id_contrato)
 	return render(request, 'contratos/grilla.html', {'contrato': contrato})
 
 def listado_contratos(request):
 	return render(request, 'contratos/listado_contratos.html', {
-		'contratos': Contrato.objects.filter(activo=True, fecha_fin__gte=date.today().isoformat())
+		'contratos': Contrato.objects.prefetch_related().filter(activo=True).order_by("id"),
+		'hoy': date.today()
 	})
 
 def ver_contrato(request, id_contrato):
 	return render(request, 'contratos/ver_contrato.html', {
-		'contrato': Contrato.objects.get(pk=id_contrato)
+		'contrato': Contrato.objects.prefetch_related().get(pk=id_contrato)
 	})
 
-def alta_contrato(request):
+def cargar_contrato(request):
 	parametros = Parametros.cargar()
 	if parametros.id is None:
 		return render(request, 'error/parametros.html')
@@ -98,7 +99,8 @@ def alta_contrato(request):
 		contrato = Contrato()
 		contrato.propiedad = Propiedad.objects.get(pk=datos['id_propiedad'])
 		if contrato.propiedad.getContratoActivo() is not None:
-			return render(request, 'contratos/alta_contrato.html', {
+			incremento = parametros.incremento_segundo_anio + 1
+			return render(request, 'contratos/cargar_contrato.html', {
 				'incremento_anual': str(incremento).replace(',', '.'),
 				'error': 'La propiedad ya tiene un contrato activo.'
 			})
@@ -109,7 +111,7 @@ def alta_contrato(request):
 		return redirect('ver_contrato', contrato.id)
 	else:
 		incremento = parametros.incremento_segundo_anio + 1
-		return render(request, 'contratos/alta_contrato.html', {
+		return render(request, 'contratos/cargar_contrato.html', {
 			'incremento_anual': str(incremento).replace(',', '.'),
 			'texto_incremento': str((incremento - 1) * 100).replace('.', ','),
 			'texto_porcentaje': str(parametros.porcentaje_propietario * 100).replace('.', ',')
@@ -125,12 +127,21 @@ def firmar_contrato(request, id_contrato):
 	else:
 		return render(request, 'contratos/firmar_contrato.html', {'contrato': contrato})
 
+def alta_contrato(request, id_contrato):
+	contrato = Contrato.objects.get(pk=id_contrato)
+	if request.method == 'POST':
+		contrato.activo = True
+		contrato.save()
+		return redirect('ver_contrato', id_contrato)
+	else:
+		return render(request, 'contratos/alta_contrato.html', {'contrato': contrato})
+
 def baja_contrato(request, id_contrato):
 	contrato = Contrato.objects.get(pk=id_contrato)
 	if request.method == 'POST':
 		contrato.activo = False
 		contrato.save()
-		return redirect('listado_contratos')
+		return redirect('ver_contrato', id_contrato)
 	else:
 		return render(request, 'contratos/baja_contrato.html', {'contrato': contrato})
 

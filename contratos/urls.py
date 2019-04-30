@@ -3,7 +3,8 @@ from contratos import views
 
 urlpatterns = [
 	path('<int:id_contrato>/facturacion/cobrar/<int:id_mes>/email', views.enviar_email, name='enviar_email'),
-    path('cargar', views.alta_contrato, name='cargar_contrato'),
+    path('cargar', views.cargar_contrato, name='cargar_contrato'),
+    path('<int:id_contrato>/alta', views.alta_contrato, name='alta_contrato'),
     path('<int:id_contrato>/baja', views.baja_contrato, name='baja_contrato'),
     path('<int:id_contrato>/documentos/contrato', views.descargar_documento, name='descargar_contrato'),
     path('<int:id_contrato>/documentos/autorizacion', views.descargar_autorizacion, name='descargar_autorizacion'),

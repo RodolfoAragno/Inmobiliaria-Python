@@ -82,6 +82,21 @@ def meses_contrato(request, id_contrato):
 		return JsonResponse(resultado, safe=False)
 
 def propiedades(request):
+	id = request.GET.get('id')
+	if id is not None:
+		propiedad = Propiedad.objects.get(id=id)
+		resultado = []
+		if propiedad is not None:
+			p = {
+				'id': propiedad.id,
+				'direccion': propiedad.direccion,
+				'nombre_propietario': propiedad.propietario.persona.getApellidoNombre(),
+				'dni_propietario': propiedad.propietario.persona.dni,
+				'tiene_contrato': propiedad.getContratoActivo() is not None,
+				'activa': propiedad.activa
+			}
+			resultado.append(p)
+		return JsonResponse(resultado, safe=False)
 	dni = request.GET.get('dni')
 	apellido = request.GET.get('apellido')
 	direccion = request.GET.get('direccion')
@@ -103,7 +118,8 @@ def propiedades(request):
 			'direccion': propiedad.direccion,
 			'nombre_propietario': propiedad.propietario.persona.getApellidoNombre(),
 			'dni_propietario': propiedad.propietario.persona.dni,
-			'tiene_contrato': propiedad.getContratoActivo() is not None
+			'tiene_contrato': propiedad.getContratoActivo() is not None,
+			'activa': propiedad.activa
 		}
 		resultado.append(p)
 	return JsonResponse(resultado, safe=False)

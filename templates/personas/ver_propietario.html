@@ -21,7 +21,7 @@
 			{% if propietario.persona.provincia != '' %}<h5>Provincia: {{ propietario.persona.provincia }}</h5>{% endif %}
 			<a href="{% url 'modificar_propietario' propietario.persona.dni %}"><button class="btn btn-small btn-info">Editar información</button></a>
 			<hr>
-			<h2 class="mt-4">Propiedades</h2>
+			<h2 class="mt-4">Propiedades <button class="btn btn-sm btn-primary" type="button" id="buttonPropsInactivas">Mostrar inactivas</button></h2>
 			{% if propiedades %}
 			<table class="table table-bordered table-sm">
 				<thead class="thead-dark">
@@ -35,9 +35,12 @@
 					<td>{{ propiedad.direccion }}</td>
 					<td><a href="{% url 'ver_propiedad' propiedad.id %}"><button class="btn btn-sm btn-primary">Ver propiedad</button></a></td>
 				{% else %}
-				<tr class="bg-invalido">
+				<tr class="d-none bg-no-pagado" name="propiedad_inactiva">
 					<td>{{ propiedad.direccion }}</td>
-					<td><a href="{% url 'modificar_propiedad' propiedad.id %}"><button class="btn btn-sm btn-primary">Dar de alta</button></a></td>
+					<td>
+						<a href="{% url 'ver_propiedad' propiedad.id %}"><button class="btn btn-sm btn-primary">Ver información</button></a>
+						<a href="{% url 'modificar_propiedad' propiedad.id %}"><button class="btn btn-sm btn-success">Dar de alta</button></a>
+					</td>
 				{% endif %}
 				</tr>
 				{% endfor %}
@@ -49,7 +52,7 @@
 			<a href="{% url 'cargar_propiedad' propietario.persona.dni %}"><button class="btn btn-small btn-warning">Cargar nueva</button></a>
 			<hr>
 			<h2 class="mt-4">Contratos activos</h2>
-			{% if contratos %}
+			{% if contratos_activos %}
 			<table class="table table-bordered table-sm">
 				<thead class="thead-dark">
 					<th>Propiedad</th>
@@ -59,7 +62,7 @@
 					<th></th>
 				</thead>
 				<tbody>
-					{% for contrato in contratos %}
+					{% for contrato in contratos_activos %}
 					<tr>
 						<td>{{ contrato.propiedad.direccion }}</td>
 						<td>{{ contrato.inquilino.persona.getApellidoNombre }}</td>
@@ -80,6 +83,76 @@
 			{% else %}
 			<h6>No cuenta con contratos activos.</h6>
 			{% endif %}
+			<hr>
+			<h2 class="mt-4">Contratos inactivos <button class="btn btn-primary" type="button" id="buttonInactivos">Mostrar</button></h2>
+			<div id="tableInactivos" class="d-none">
+			{% if contratos_inactivos %}
+			<table class="table table-bordered table-sm">
+				<thead class="thead-dark">
+					<th>Propiedad</th>
+					<th>Inquilino</th>
+					<th>Fecha de inicio</th>
+					<th>Fecha de finalización</th>
+					<th></th>
+				</thead>
+				<tbody>
+					{% for contrato in contratos_inactivos %}
+					<tr>
+						<td>{{ contrato.propiedad.direccion }}</td>
+						<td>{{ contrato.inquilino.persona.getApellidoNombre }}</td>
+						<td>{{ contrato.fecha_inicio }}</td>
+						<td>{{ contrato.fecha_fin }}</td>
+						<td>
+							<a href="{% url 'ver_contrato' contrato.id %}"><button type="button" class="btn btn-sm btn-primary">Ver contrato</button></a>
+							{% if contrato.fecha_firma %}
+							<a href="{% url 'grilla' contrato.id %}">
+								<button type="button" class="btn btn-sm btn-success">Facturación</button>
+							</a>
+							{% endif %}
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			{% else %}
+			<h6>No cuenta con contratos inactivos.</h6>
+			{% endif %}
+			</div>
 		</div>
 	{% endif %}
 {% endblock cuerpo %}
+{% block javascript %}
+<script>
+    let props_inactivas = [], mostrar_inactivas = false;
+    window.onload = function(e) {
+        props_inactivas = document.getElementsByName("propiedad_inactiva");
+    }
+	const botonPropsInactivas = document.getElementById("buttonPropsInactivas");
+	botonPropsInactivas.addEventListener("click", function() {
+		if (mostrar_inactivas) {
+			botonPropsInactivas.textContent = "Mostrar inactivas";
+			props_inactivas.forEach((prop) => {
+				prop.classList.add("d-none");
+			});
+		} else {
+			botonPropsInactivas.textContent = "Ocultar inactivas";
+			props_inactivas.forEach((prop) => {
+				prop.classList.remove("d-none");
+			});
+		}
+		mostrar_inactivas = !mostrar_inactivas;
+	});
+
+	const botonInactivos = document.getElementById("buttonInactivos");
+	botonInactivos.addEventListener("click", function() {
+		const tabla = document.getElementById("tableInactivos");
+		if (tabla.classList.contains("d-none")) {
+			tabla.classList.remove("d-none");
+			botonInactivos.textContent = "Ocultar";
+		} else {
+			tabla.classList.add("d-none");
+			botonInactivos.textContent = "Mostrar";
+		}
+	});
+</script>
+{% endblock javascript %}

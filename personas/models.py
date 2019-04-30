@@ -8,13 +8,13 @@ class Persona(models.Model):
 	apellido = models.CharField(max_length=70, default='')
 	
 	# Atributos opcionales
-	email = models.CharField(max_length=512, blank=True, default='')
+	email = models.EmailField(max_length=512, blank=True, default='')
 	telefono = models.CharField(max_length=55, blank=True, default='')
-	direccion = models.CharField(max_length=554, blank=True, default='')
+	direccion = models.CharField(max_length=512, blank=True, default='')
 	
 	# Para garantes:
-	ciudad = models.CharField(max_length=50, blank=True, default='Santa Fe')
-	provincia = models.CharField(max_length=50, blank=True, default='Santa Fe')
+	ciudad = models.CharField(max_length=70, blank=True, default='Santa Fe')
+	provincia = models.CharField(max_length=70, blank=True, default='Santa Fe')
 	nacionalidad = models.CharField(max_length=55, blank=True, default='Argentino/a')
 	
 	class Meta:

@@ -14,7 +14,6 @@ def parametros(request):
 		contr = request.POST.get('email_contrasenia', None)
 		if contr is not None and contr != '':
 			parametros.email_contrasenia = contr
-
 		try:
 			parametros.save()
 			parametros.porcentaje_propietario *= 100

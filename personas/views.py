@@ -121,10 +121,18 @@ def ver_inquilino(request, dni):
     except:
         inquilino = None
     else:
-        contratos = Contrato.objects.filter(inquilino__persona__dni=dni, activo=True, fecha_fin__gte=date.today())
+        contratos = Contrato.objects.filter(inquilino__persona__dni=dni)
+        activos = []
+        inactivos = []
+        for contrato in contratos:
+            if contrato.activo == False or contrato.fecha_fin < date.today():
+                inactivos.append(contrato)
+            else:
+                activos.append(contrato)
     return render(request, 'personas/ver_inquilino.html', {
         'inquilino': inquilino,
-        'contratos': contratos
+        'contratos_activos': activos,
+        'contratos_inactivos': inactivos
     })
 
 def ver_propietario(request, dni):
@@ -135,9 +143,17 @@ def ver_propietario(request, dni):
         propietario = None
         propiedades = None
     else:
-        contratos = Contrato.objects.filter(propiedad__propietario__persona__dni=dni, activo=True, fecha_fin__gte=date.today())
+        contratos = Contrato.objects.filter(propiedad__propietario__persona__dni=dni)
+        activos = []
+        inactivos = []
+        for contrato in contratos:
+            if contrato.activo == False or contrato.fecha_fin < date.today():
+                inactivos.append(contrato)
+            else:
+                activos.append(contrato)
     return render(request, 'personas/ver_propietario.html', { 
         'propietario': propietario,
         'propiedades': propiedades,
-        'contratos': contratos
+        'contratos_activos': activos,
+        'contratos_inactivos': inactivos
     })

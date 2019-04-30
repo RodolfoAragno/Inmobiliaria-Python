@@ -12,6 +12,12 @@
 	{% else %}
 		<div class="container text-center">
 			<h1>Información de la propiedad</h1>
+        	{% if not propiedad.activa %}
+			<div class="alert alert-danger" role="alert">
+				<h4 class="alert-heading">PROPIEDAD INACTIVA</h4>
+				<p>Para darla de alta, ingresar en <strong>Editar información</strong> y luego <strong>Guardar</strong>.</p>
+			</div>
+			{% endif %}
 			<h5>{{ propiedad.direccion }}</h5>
 			<h5>Propietario: <a href="{% url 'ver_propietario' propiedad.propietario.persona.dni %}">{{ propiedad.propietario.persona.getApellidoNombre }}</a>
 			{% if propiedad.descripcion != '' %}<h5>Descripción: {{ propiedad.descripcion }}</h5>{% endif %}

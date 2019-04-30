@@ -1,11 +1,10 @@
 .recibos {
-    height: 100%;
     display: flex;
     flex-direction: column;
-	flex-wrap: nowrap;
-	justify-content: space-around;
-	align-items: stretch;
-	align-content: stretch;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: stretch;
+    align-content: stretch;
 }
 
 .recibo {
@@ -15,6 +14,7 @@
 
 .invoice-box {
     max-width: 800px;
+    padding: 30px;
     font-size: 14px;
     line-height: 20px;
     font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;

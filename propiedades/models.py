@@ -13,10 +13,10 @@ class Propiedad(models.Model):
 		return '#' + str(self.id) + ' ' + self.direccion
 	
 	def getContratoActivo(self):
-		for contrato in self.contratos.all():
-			if contrato.activo:
-				return contrato
-		return None
+		try:
+			return self.contratos.filter(activo=True)[0]
+		except IndexError:
+			return None
 	
 	def generar_poder(self):
 		pass

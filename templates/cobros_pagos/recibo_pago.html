@@ -1,150 +1,159 @@
 {% load static %}
 <html>
+
 <head>
     <title>Recibo de pago</title>
     <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
-    <link rel="stylesheet" href="{% static "css/recibos.css" %}"
+    <link rel="stylesheet" href="{% static "css/recibos.css" %}">
 </head>
+
 <body>
     <div class="row justify-content-center no-print">
-		<div class="col-auto"><a href="{% url 'pagar' mes.contrato.id mes.id %}"><button class="btn btn-danger">Volver</button></a></div>
-		<div class="col-auto"><button class="btn btn-success" onclick="window.print();">Imprimir recibos</button></div>
+        <div class="col-auto"><a href="{% url 'pagar' mes.contrato.id mes.id %}"><button
+                    class="btn btn-danger">Volver</button></a></div>
+        <div class="col-auti"><button class="btn btn-success" onclick="window.print();">Imprimir recibos</button></div>
     </div>
-    <div class="container recibos">
-        <div class="row justify-content-center recibo">
-    <div class="invoice-box">
-        <table cellpadding="0" cellspacing="0">
-            <tr class="top">
-                <td colspan="2">
-                    <table>
-                        <tr>
-                            <td class="title text-center">
-								<img src="{% static "img/logo-inv.png" %}" style="width:150px; margin-bottom: 5px;"><br>
-                                Salta 2862 - Santa Fe, Argentina<br>
-                                gazzeinmobiliaria@gmail.com<br>
-                                gazzeinmobiliaria.com<br>
-                                (0342) 4563711<br>
-                            </td>
-							<td class="title">
-								<br>
-								<h2>RECIBO</h2>
-							</td>
-							<td class="title">
-								<h2>ORIGINAL</h2>
-                                {{ mes.fecha_pagado_propietario }}
-							</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr class="information">
-                <td colspan="2">
-                    <table>
-                        <tr>
-                            <td>
-								Recibí ${{ mes.totalAPagar }} (pesos {{ total_texto }}) de Federico J. Gazze en concepto de pago alquiler mes {{ texto_mes }} - propiedad {{ mes.contrato.propiedad.direccion }}.
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr class="heading">
-                <td>
-                    Detalle
-                </td>
-                <td>
-                    Monto
-                </td>
-            </tr>
-            {% for detalle in mes.getDetallePropietario %}
-            <tr class="item">
-                <td>
-                    {{ detalle.descripcion }}
-                </td>
-                <td>
-                    ${{ detalle.valor }}.-
-                </td>
-            </tr>
-            {% endfor %}
-            <tr class="total">
-                <td></td>
-                <td>
-                   Total: ${{ mes.totalAPagar }}.-
-                </td>
-			</tr>
-        </table>
-    </div>
-    </div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="invoice-box">
+                <table cellpadding="0" cellspacing="0" style="margin-bottom: 10em;">
+                    <tr class="top">
+                        <td colspan="2">
+                            <table>
+                                <tr>
+                                    <td class="title text-center">
+                                        <img src="{% static "img/logo-inv.png" %}"
+                                            style="width:150px; margin-bottom: 5px;"><br>
+                                        Salta 2862 - Santa Fe, Argentina<br>
+                                        gazzeinmobiliaria@gmail.com<br>
+                                        gazzeinmobiliaria.com<br>
+                                        (0342) 4563711<br>
+                                    </td>
+                                    <td class="title">
+                                        <br>
+                                        <h2>RECIBO</h2>
+                                    </td>
+                                    <td class="title">
+                                        <h2>ORIGINAL</h2>
+                                        {{ mes.fecha_pagado_propietario }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="information">
+                        <td colspan="2">
+                            <table>
+                                <tr>
+                                    <td>
+                                        Recibí ${{ mes.totalAPagar }} (pesos {{ total_texto }}) de Federico J. Gazze en
+                                        concepto de pago alquiler mes {{ texto_mes }} - propiedad
+                                        {{ mes.contrato.propiedad.direccion }}.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="heading">
+                        <td>
+                            Detalle
+                        </td>
+                        <td>
+                            Monto
+                        </td>
+                    </tr>
+                    {% for detalle in mes.getDetallePropietario %}
+                    <tr class="item">
+                        <td>
+                            {{ detalle.descripcion }}
+                        </td>
+                        <td>
+                            ${{ detalle.valor }}.-
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="total">
+                        <td></td>
+                        <td>
+                            Total: ${{ mes.totalAPagar }}.-
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
 
 
         <!-- DUPLICADO -->
 
 
-
-        <div class="row justify-content-center recibo">
+        <div class="row justify-content-center">
             <div class="invoice-box">
-		<table cellpadding="0" cellspacing="0">
-            <tr class="top">
-                <td colspan="2">
-                    <table>
-                        <tr>
-                            <td class="title text-center">
-								<img src="{% static "img/logo-inv.png" %}" style="width:150px; margin-bottom: 5px;"><br>
-                                Salta 2862 - Santa Fe, Argentina<br>
-                                gazzeinmobiliaria@gmail.com<br>
-                                gazzeinmobiliaria.com<br>
-                                (0342) 4563711<br>
-                            </td>
-							<td class="title">
-								<br>
-								<h2>RECIBO</h2>
-							</td>
-							<td class="title">
-								<h2>DUPLICADO</h2>
-                                {{ mes.fecha_pagado_propietario }}
-							</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr class="information">
-                <td colspan="2">
-                    <table>
-                        <tr>
-                            <td>
-								Recibí ${{ mes.totalAPagar }} (pesos {{ total_texto }}) de Federico J. Gazze en concepto de pago alquiler mes {{ texto_mes }} - propiedad {{ mes.contrato.propiedad.direccion }}.
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr class="heading">
-                <td>
-                    Detalle
-                </td>
-                <td>
-                    Monto
-                </td>
-            </tr>
-            {% for detalle in mes.getDetallePropietario %}
-            <tr class="item">
-                <td>
-                    {{ detalle.descripcion }}
-                </td>
-                <td>
-                    ${{ detalle.valor }}.-
-                </td>
-            </tr>
-            {% endfor %}
-            <tr class="total" style="padding-bottom: 50px;">
-                <td></td>
-                <td>
-                   Total: ${{ mes.totalAPagar }}.-
-                </td>
-            </tr>
-        </table>
-    </div>
-    </div>
+                <table cellpadding="0" cellspacing="0">
+                    <tr class="top">
+                        <td colspan="2">
+                            <table>
+                                <tr>
+                                    <td class="title text-center">
+                                        <img src="{% static "img/logo-inv.png" %}"
+                                            style="width:150px; margin-bottom: 5px;"><br>
+                                        Salta 2862 - Santa Fe, Argentina<br>
+                                        gazzeinmobiliaria@gmail.com<br>
+                                        gazzeinmobiliaria.com<br>
+                                        (0342) 4563711<br>
+                                    </td>
+                                    <td class="title">
+                                        <br>
+                                        <h2>RECIBO</h2>
+                                    </td>
+                                    <td class="title">
+                                        <h2>DUPLICADO</h2>
+                                        {{ mes.fecha_pagado_propietario }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="information">
+                        <td colspan="2">
+                            <table>
+                                <tr>
+                                    <td>
+                                        Recibí ${{ mes.totalAPagar }} (pesos {{ total_texto }}) de Federico J. Gazze en
+                                        concepto de pago alquiler mes {{ texto_mes }} - propiedad
+                                        {{ mes.contrato.propiedad.direccion }}.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="heading">
+                        <td>
+                            Detalle
+                        </td>
+                        <td>
+                            Monto
+                        </td>
+                    </tr>
+                    {% for detalle in mes.getDetallePropietario %}
+                    <tr class="item">
+                        <td>
+                            {{ detalle.descripcion }}
+                        </td>
+                        <td>
+                            ${{ detalle.valor }}.-
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="total" style="padding-bottom: 50px;">
+                        <td></td>
+                        <td>
+                            Total: ${{ mes.totalAPagar }}.-
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
 </body>
+
 </html>

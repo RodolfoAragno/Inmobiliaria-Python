@@ -77,6 +77,7 @@ class Contrato(models.Model):
 	def generar_meses(self):
 		#generar el poder a travez de la propiedad
 		aux_fecha_vencimiento = datetime(self.fecha_inicio.year, self.fecha_inicio.month, 10)
+		print(self.monto_primer_anio)
 		#convertir el dia de vencimiento en parametro
 		for _ in range(12):#meses del primer año
 			mes = MesContrato()
@@ -164,11 +165,12 @@ class MesContrato(models.Model):
 	fecha_pagado_propietario = models.DateField(null=True, default=None)
 	fecha_pagado_inquilino = models.DateField(null=True, default=None)
 
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		if self.id is not None:
-			self.calcular_intereses()
-	
+	@classmethod
+	def from_db(cls, db, field_names, values):
+		instance = super().from_db(db, field_names, values)
+		instance.calcular_intereses()
+		return instance
+
 	def save(self, creando=False):
 		if self.id is not None:
 			self.calcular_intereses()

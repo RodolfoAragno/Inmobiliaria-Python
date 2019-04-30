@@ -9,6 +9,14 @@
 {% else %}
     <div class="container text-center">
         <h1>Información del contrato</h1>
+        {% if not contrato.activo %}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">CONTRATO INACTIVO</h4>
+            <p>El contrato fue dado de baja manualmente.</p>
+            <a class="btn btn-primary" href="{% url 'cargar_contrato' %}?propiedad={{contrato.propiedad.id}}&inquilino={{contrato.inquilino.persona.dni}}">Crear un nuevo contrato a partir de este</a>
+            <a href="{% url 'alta_contrato' contrato.id %}"><button class="btn btn-small btn-success">Dar de alta</button>
+        </div>
+        {% endif %}
         <h5><a href="{% url 'ver_propiedad' contrato.propiedad.id %}">{{ contrato.propiedad.direccion }}</a></h5>
         {% if contrato.fecha_firma is not None %}<h5>Contrato firmado el {{ contrato.fecha_firma }}</h5>
         {% else %}<h5 class="text-danger">Contrato no firmado</h5>{% endif %}
@@ -20,7 +28,9 @@
             {% else %}
             <div class="col-auto"><a href="{% url 'grilla' contrato.id %}"><button class="btn btn-small btn-success">Facturación</button></a></div>
             {% endif %}
+            {% if contrato.activo %}
             <div class="col-auto"><a href="{% url 'baja_contrato' contrato.id %}"><button class="btn btn-small btn-danger">Dar de baja</button></a></div>
+            {% endif %}
             <div class="col-auto"><a href="{% url 'descargar_contrato' contrato.id %}"><button class="btn btn-small btn-warning">Descargar documento</button></a></div>
             <div class="col-auto"><a href="{% url 'descargar_autorizacion' contrato.id %}"><button class="btn btn-small btn-primary">Descargar autorización</button></a></div>
         </div>

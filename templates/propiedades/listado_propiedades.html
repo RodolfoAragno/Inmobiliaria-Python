@@ -37,8 +37,12 @@
                     <td>
                         <a href="{% url 'ver_propiedad' propiedad.id %}"><button type="button" class="btn btn-info btn-sm">Ver detalle</button></a>
                         <a href="{% url 'modificar_propiedad' propiedad.id %}"><button type="button" class="btn btn-primary btn-sm">Editar propiedad</button></a>
-                        {% if propiedad.getContratoActivo and propiedad.getContratoActivo.fecha_firma %}
-                        <a href="{% url 'grilla' propiedad.getContratoActivo.id %}"><button type="button" class="btn btn-success btn-sm">Facturación</button></a>
+                        {% if propiedad.getContratoActivo %}
+                            {% if propiedad.getContratoActivo.fecha_firma %}
+                            <a href="{% url 'grilla' propiedad.getContratoActivo.id %}"><button type="button" class="btn btn-success btn-sm">Facturación</button></a>
+                            {% else %}
+                            <a href="{% url 'ver_contrato' propiedad.getContratoActivo.id %}"><button type="button" class="btn btn-warning btn-sm">Ver contrato</button></a>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>
