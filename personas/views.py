@@ -119,20 +119,22 @@ def ver_inquilino(request, dni):
     try:
         inquilino = Inquilino.objects.get(persona__dni=dni)
     except:
-        inquilino = None
-    else:
-        contratos = Contrato.objects.filter(inquilino__persona__dni=dni)
-        activos = []
-        inactivos = []
-        for contrato in contratos:
-            if contrato.activo == False or contrato.fecha_fin < date.today():
-                inactivos.append(contrato)
-            else:
-                activos.append(contrato)
+        return render(request, 'personas/ver_inquilino.html', {
+            'inquilino': None,
+        })
+    contratos = Contrato.objects.filter(inquilino__persona__dni=dni).order_by('-id').prefetch_related()
+    activos = []
+    inactivos = []
+    for contrato in contratos:
+        if contrato.activo:
+            activos.append(contrato)
+        else:
+            inactivos.append(contrato)
     return render(request, 'personas/ver_inquilino.html', {
         'inquilino': inquilino,
         'contratos_activos': activos,
-        'contratos_inactivos': inactivos
+        'contratos_inactivos': inactivos,
+		'hoy': date.today()
     })
 
 def ver_propietario(request, dni):
@@ -140,20 +142,22 @@ def ver_propietario(request, dni):
         propietario = Propietario.objects.get(persona__dni=dni)
         propiedades = propietario.propiedad_set.all()
     except:
-        propietario = None
-        propiedades = None
-    else:
-        contratos = Contrato.objects.filter(propiedad__propietario__persona__dni=dni)
-        activos = []
-        inactivos = []
-        for contrato in contratos:
-            if contrato.activo == False or contrato.fecha_fin < date.today():
-                inactivos.append(contrato)
-            else:
-                activos.append(contrato)
+        return render(request, 'personas/ver_propietario.html', { 
+            'propietario': None,
+            'propiedades': None
+        })
+    contratos = Contrato.objects.filter(propiedad__propietario__persona__dni=dni).order_by('-id').prefetch_related()
+    activos = []
+    inactivos = []
+    for contrato in contratos:
+        if contrato.activo:
+            activos.append(contrato)
+        else:
+            inactivos.append(contrato)
     return render(request, 'personas/ver_propietario.html', { 
         'propietario': propietario,
         'propiedades': propiedades,
         'contratos_activos': activos,
-        'contratos_inactivos': inactivos
+        'contratos_inactivos': inactivos,
+		'hoy': date.today()
     })

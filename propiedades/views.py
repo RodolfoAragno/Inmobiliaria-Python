@@ -30,18 +30,21 @@ def ver_propiedad(request, id):
 	try:
 		propiedad = Propiedad.objects.get(id=id)
 	except:
-		propiedad = None
+		return render(request, 'propiedades/ver_propiedad.html', {
+			'propiedad': None
+		})
 	activos = []
 	inactivos = []
 	for contrato in propiedad.contratos.all().order_by('-id').prefetch_related():
-		if contrato.activo == False or contrato.fecha_fin < date.today():
-			inactivos.append(contrato)
-		else:
+		if contrato.activo:
 			activos.append(contrato)
+		else:
+			inactivos.append(contrato)
 	return render(request, 'propiedades/ver_propiedad.html', {
 		'propiedad':propiedad,
 		'contratos_activos': activos,
-		'contratos_inactivos': inactivos
+		'contratos_inactivos': inactivos,
+		'hoy': date.today()
 	})
 
 def modificar_propiedad(request, id):

@@ -63,8 +63,8 @@
 				</thead>
 				<tbody>
 					{% for contrato in contratos_activos %}
-					<tr>
-						<td>{{ contrato.propiedad.direccion }}</td>
+					<tr {% if contrato.fecha_fin < hoy %}class="bg-invalido"{% endif %}>
+						<td>{% if contrato.fecha_fin < hoy %}<span class="badge badge-dark">FINALIZADO</span> {% endif %}{{ contrato.propiedad.direccion }}</td>
 						<td>{{ contrato.inquilino.persona.getApellidoNombre }}</td>
 						<td>{{ contrato.fecha_inicio }}</td>
 						<td>{{ contrato.fecha_fin }}</td>
@@ -97,8 +97,8 @@
 				</thead>
 				<tbody>
 					{% for contrato in contratos_inactivos %}
-					<tr>
-						<td>{{ contrato.propiedad.direccion }}</td>
+					<tr {% if contrato.fecha_fin < hoy %}class="bg-invalido"{% endif %}>
+						<td>{% if contrato.fecha_fin < hoy %}<span class="badge badge-dark">FINALIZADO</span> {% endif %}{{ contrato.propiedad.direccion }}</td>
 						<td>{{ contrato.inquilino.persona.getApellidoNombre }}</td>
 						<td>{{ contrato.fecha_inicio }}</td>
 						<td>{{ contrato.fecha_fin }}</td>

@@ -4,94 +4,97 @@
 {% else %}Inquilino {{ inquilino.persona.getApellidoNombre }} - Gazze Inmobiliaria{% endif %}
 {% endblock titulo %}
 {% block cuerpo %}
-	{% if inquilino is None %}
-		<div class="container">
-			<h2>Error</h2>
-			No se encontró el inquilino.
-		</div>
+{% if inquilino is None %}
+<div class="container">
+	<h2>Error</h2>
+	No se encontró el inquilino.
+</div>
+{% else %}
+<div class="container text-center pt-4">
+	<h1 class="mb-3">Información del inquilino</h1>
+	<h5>{{ inquilino.persona.getApellidoNombre }}</h5>
+	<h5>DNI {{ inquilino.persona.dni }}</h5>
+	{% if inquilino.persona.email != '' %}<h5>Email: {{ inquilino.persona.email }}</h5>{% endif %}
+	{% if inquilino.persona.telefono != '' %}<h5>Teléfono: {{ inquilino.persona.telefono }}</h5>{% endif %}
+	<a href="{% url 'modificar_inquilino' inquilino.persona.dni %}"><button class="btn btn-small btn-info">Editar
+			información</button></a>
+	<hr>
+	<h2 class="mt-4">Contratos activos</h2>
+	{% if contratos_activos %}
+	<table class="table table-bordered table-sm">
+		<thead class="thead-dark">
+			<th>Propiedad</th>
+			<th>Fecha de inicio</th>
+			<th>Fecha de finalización</th>
+			<th></th>
+		</thead>
+		<tbody>
+			{% for contrato in contratos_activos %}
+			<tr {% if contrato.fecha_fin < hoy %}class="bg-invalido"{% endif %}>
+				<td>{% if contrato.fecha_fin < hoy %}<span class="badge badge-dark">FINALIZADO</span> {% endif %}{{ contrato.propiedad.direccion }}</td>
+				<td>{{ contrato.fecha_inicio }}</td>
+				<td>{{ contrato.fecha_fin }}</td>
+				<td>
+					<a href="{% url 'ver_contrato' contrato.id %}">
+						<button type="button" class="btn btn-sm btn-primary">Ver contrato</button>
+					</a>
+					{% if contrato.fecha_firma %}
+					<a href="{% url 'grilla' contrato.id %}">
+						<button type="button" class="btn btn-sm btn-success">Facturación</button>
+					</a>
+					{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 	{% else %}
-		<div class="container text-center pt-4">
-			<h1 class="mb-3">Información del inquilino</h1>
-			<h5>{{ inquilino.persona.getApellidoNombre }}</h5>
-			<h5>DNI {{ inquilino.persona.dni }}</h5>
-			{% if inquilino.persona.email != '' %}<h5>Email: {{ inquilino.persona.email }}</h5>{% endif %}
-			{% if inquilino.persona.telefono != '' %}<h5>Teléfono: {{ inquilino.persona.telefono }}</h5>{% endif %}
-			<a href="{% url 'modificar_inquilino' inquilino.persona.dni %}"><button class="btn btn-small btn-info">Editar información</button></a>
-			<hr>
-			<h2 class="mt-4">Contratos activos</h2>
-			{% if contratos_activos %}
-			<table class="table table-bordered table-sm">
-				<thead class="thead-dark">
-					<th>Propiedad</th>
-					<th>Fecha de inicio</th>
-					<th>Fecha de finalización</th>
-					<th></th>
-				</thead>
-				<tbody>
-					{% for contrato in contratos_activos %}
-					<tr>
-						<td>{{ contrato.propiedad.direccion }}</td>
-						<td>{{ contrato.fecha_inicio }}</td>
-						<td>{{ contrato.fecha_fin }}</td>
-						<td>
-							<a href="{% url 'ver_contrato' contrato.id %}">
-								<button type="button" class="btn btn-sm btn-primary">Ver contrato</button>
-							</a>
-							{% if contrato.fecha_firma %}
-							<a href="{% url 'grilla' contrato.id %}">
-								<button type="button" class="btn btn-sm btn-success">Facturación</button>
-							</a>
-							{% endif %}
-						</td>
-					</tr>
-					{% endfor %}					
-				</tbody>
-			</table>
-			{% else %}
-			<h6>No cuenta con contratos activos.</h6>
-			{% endif %}
-			<hr>
-			<h2 class="mt-4">Contratos inactivos <button class="btn btn-primary" type="button" id="buttonInactivos">Mostrar</button></h2>
-			<div id="tableInactivos" class="d-none">
-			{% if contratos_inactivos %}
-			<table class="table table-bordered table-sm">
-				<thead class="thead-dark">
-					<th>Propiedad</th>
-					<th>Inquilino</th>
-					<th>Fecha de inicio</th>
-					<th>Fecha de finalización</th>
-					<th></th>
-				</thead>
-				<tbody>
-					{% for contrato in contratos_inactivos %}
-					<tr>
-						<td>{{ contrato.propiedad.direccion }}</td>
-						<td>{{ contrato.inquilino.persona.getApellidoNombre }}</td>
-						<td>{{ contrato.fecha_inicio }}</td>
-						<td>{{ contrato.fecha_fin }}</td>
-						<td>
-							<a href="{% url 'ver_contrato' contrato.id %}"><button type="button" class="btn btn-sm btn-primary">Ver contrato</button></a>
-							{% if contrato.fecha_firma %}
-							<a href="{% url 'grilla' contrato.id %}">
-								<button type="button" class="btn btn-sm btn-success">Facturación</button>
-							</a>
-							{% endif %}
-						</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-			{% else %}
-			<h6>No cuenta con contratos inactivos.</h6>
-			{% endif %}
-			</div>
-		</div>
+	<h6>No cuenta con contratos activos.</h6>
 	{% endif %}
+	<hr>
+	<h2 class="mt-4">Contratos inactivos <button class="btn btn-primary" type="button"
+			id="buttonInactivos">Mostrar</button></h2>
+	<div id="tableInactivos" class="d-none">
+		{% if contratos_inactivos %}
+		<table class="table table-bordered table-sm">
+			<thead class="thead-dark">
+				<th>Propiedad</th>
+				<th>Inquilino</th>
+				<th>Fecha de inicio</th>
+				<th>Fecha de finalización</th>
+				<th></th>
+			</thead>
+			<tbody>
+				{% for contrato in contratos_inactivos %}
+				<tr {% if contrato.fecha_fin < hoy %}class="bg-invalido"{% endif %}>
+					<td>{% if contrato.fecha_fin < hoy %}<span class="badge badge-dark">FINALIZADO</span> {% endif %}{{ contrato.propiedad.direccion }}</td>
+					<td>{{ contrato.inquilino.persona.getApellidoNombre }}</td>
+					<td>{{ contrato.fecha_inicio }}</td>
+					<td>{{ contrato.fecha_fin }}</td>
+					<td>
+						<a href="{% url 'ver_contrato' contrato.id %}"><button type="button"
+								class="btn btn-sm btn-primary">Ver contrato</button></a>
+						{% if contrato.fecha_firma %}
+						<a href="{% url 'grilla' contrato.id %}">
+							<button type="button" class="btn btn-sm btn-success">Facturación</button>
+						</a>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		{% else %}
+		<h6>No cuenta con contratos inactivos.</h6>
+		{% endif %}
+	</div>
+</div>
+{% endif %}
 {% endblock cuerpo %}
 {% block javascript %}
 <script>
 	const botonInactivos = document.getElementById("buttonInactivos");
-	botonInactivos.addEventListener("click", function() {
+	botonInactivos.addEventListener("click", function () {
 		const tabla = document.getElementById("tableInactivos");
 		if (tabla.classList.contains("d-none")) {
 			tabla.classList.remove("d-none");
