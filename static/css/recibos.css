@@ -11,7 +11,7 @@ body {
 
 .recibo {
     height: 50%;
-    align-content: center;
+    align-content: flex-start;
 }
 
 .invoice-box {
