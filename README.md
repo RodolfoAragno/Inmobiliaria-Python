@@ -58,4 +58,8 @@ Para ingresar al servidor con un dominio falso. Por ejemplo: `http://inmobiliari
 ## Otros
 
 * **Permisos del repositorio:**
-    1. Agregar key SSH pública de la computadora servidor en Configuración > Repositorio > Deploy keys.
+    1. Agregar key SSH pública de la computadora servidor en Configuración > Repositorio > Deploy keys
+
+## Key de VM de Gazze
+
+.ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZag+3CCi4AK/mXGHAn3HEiaOGpAvz5bUV4lZXgUsBuPXvkPvUUE1NmJOrDTgCP8Fc3xyMq3sJjxjwo34mS/U7twmdgnvFB/mh6ofuQQu9MSnQA7qvGi7Hyx8kI2CMMJxaB+ZSfxMS+Pn+lmiuV3aRq8xED6ondOljiQtrvdO3qf+TOUTjpWfer3xxCjtP14hYmsjEt3D5l29Fnt94monLiboaCdxUs7lYzgk/w5cWsxDzQ3uvIhrGfk2ENLFIB8cD+1hi7S5h2x6d12FTKM4WvM9qpbzTAYCQqg3/PVo45+ygw6+6Hy42OdNXaLZ1gxWKbpWUSxBp5QBe6efTvQT/ root@inmobiliaria
