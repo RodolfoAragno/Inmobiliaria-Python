@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 import os
 from mailmerge import MailMerge
 from datetime import datetime, timedelta, date
@@ -18,54 +19,112 @@ class Contrato(models.Model):
 	inquilino = models.ForeignKey(Inquilino, on_delete=models.DO_NOTHING, related_name="contratos")
 	propiedad = models.ForeignKey(Propiedad, on_delete=models.DO_NOTHING, related_name="contratos")
 	fecha_inicio = models.DateField(auto_now=False, auto_now_add=False)
-	fecha_mitad = models.DateField(auto_now=False, auto_now_add=False)# fecha_inicio + relativedelta(years=1) - relativedelta(days=1)
-	fecha_fin = models.DateField(auto_now=False, auto_now_add=False)
 	
-	monto_primer_anio = models.DecimalField(max_digits=12, decimal_places=2) # monto fijo mensual del alquiler
-	monto_segundo_anio = models.DecimalField(max_digits=12, decimal_places=2)
+	monto_primer_anio = models.DecimalField(max_digits=12, decimal_places=2, null=True, default=None) # monto fijo mensual del alquiler
+	monto_segundo_anio = models.DecimalField(max_digits=12, decimal_places=2, null=True, default=None)
+	montos = ArrayField(
+		models.DecimalField(max_digits=12, decimal_places=2),
+		size=4,
+		null=True,
+		default=None,
+	)
 
 	fecha_firma = models.DateField(null=True, default=None)
 	
 	activo = models.BooleanField(default=True)# para borrarlos
 	garantes = models.ManyToManyField(Persona, related_name='+')
+
+	@property
+	def fecha_fin_primer_semestre(self):
+		return self.fecha_inicio + relativedelta(months=6) - relativedelta(days=1)
+
+	@property
+	def fecha_inicio_segundo_semestre(self):
+		return self.fecha_inicio + relativedelta(months=6)
+
+	@property
+	def fecha_fin_segundo_semestre(self):
+		return self.fecha_inicio + relativedelta(months=12) - relativedelta(days=1)
+
+	@property
+	def fecha_inicio_tercer_semestre(self):
+		return self.fecha_inicio + relativedelta(months=12)
+
+	@property
+	def fecha_fin_tercer_semestre(self):
+		return self.fecha_inicio + relativedelta(months=18) - relativedelta(days=1)
+
+	@property
+	def fecha_inicio_cuarto_semestre(self):
+		return self.fecha_inicio + relativedelta(months=18)
+
+	@property
+	def fecha_fin_cuarto_semestre(self):
+		return self.fecha_inicio + relativedelta(months=24) - relativedelta(days=1)
 	
+	@property
+	def es_semestral(self):
+		return self.montos[0] != self.montos[1] or self.montos[2] != self.montos[3]
+
 	def save(self, *args, **kwargs):
 		parametros = Parametros.cargar()
-		# calcula fecha_fin y fecha_mitad:
-		if type(self.fecha_inicio) is str:
-			self.fecha_fin = datetime.strptime(self.fecha_inicio, "%Y-%m-%d").date() + relativedelta(years=2) - relativedelta(days=1)
-			self.fecha_mitad = datetime.strptime(self.fecha_inicio, "%Y-%m-%d").date() + relativedelta(years=1) - relativedelta(days=1)
-		else:
-			self.fecha_fin = self.fecha_inicio + relativedelta(years=2) - relativedelta(days=1)
-			self.fecha_mitad = self.fecha_inicio + relativedelta(years=1) - relativedelta(days=1)
-		# calcula monto del 2do año
-		self.monto_segundo_anio = self.monto_primer_anio + self.monto_primer_anio * parametros.incremento_segundo_anio
 		super().save(*args, **kwargs)
 	
 	def generar_documento(self):
 		texto_garantes = "El/la señor/a NOMBRE, D.N.I. DNI, domiciliado/a en calle DOMICILIO, ciudad de Santa Fe, Provincia de Santa Fe"
-		document = MailMerge(os.path.join(TEMPLATES_DIR, 'documentos/contrato.docx'))
-		document.merge(
-			INQUILINO_NOMBRE=self.inquilino.persona.getNombreApellido().upper(),
-			INQUILINO_DNI=self.inquilino.persona.dni.__str__(),
-			INQUILINO_NACIONALIDAD=self.inquilino.persona.nacionalidad,
-			PROPIEDAD_DIRECCION=self.propiedad.direccion,
-			PROPIEDAD_CARACTERISTICAS=self.propiedad.descripcion,
-			CONTRATO_FECHA_INICIO=format_date(self.fecha_inicio, format='long', locale='es'),
-			CONTRATO_FECHA_FIN=format_date(self.fecha_fin, format='long', locale='es'),
-			CONTRATO_FECHA_MITAD=format_date(self.fecha_mitad, format='long', locale='es'),
-			CONTRATO_PERIODO1=format_date(self.fecha_inicio, format='long', locale='es') + ' al ' + format_date(self.fecha_fin, format='long', locale='es'),
-			CONTRATO_CUOTA1=num2words(self.monto_primer_anio, lang='es').upper() + ' (${})'.format(self.monto_primer_anio),
-			CONTRATO_CUOTA2=num2words(self.monto_segundo_anio, lang='es').upper() + ' (${})'.format(self.monto_segundo_anio),
-			GARANTES=texto_garantes,
-			CONTRATO_FECHA_FIRMA=format_date(self.fecha_firma, format='long', locale='es'),
-			FIRMAS_INQUILINO=self.inquilino.persona.getNombreApellido().upper(),
-			GARANTE1_NOMBRE="GARANTE 1",
-			GARANTE2_NOMBRE="GARANTE 2",
-			GARANTE3_NOMBRE="GARANTE 3",
-			GARANTE4_NOMBRE="GARANTE 4",
-			GARANTE5_NOMBRE="GARANTE 5",
-		)
+		document = None
+		if self.es_semestral:
+			document = MailMerge(os.path.join(TEMPLATES_DIR, 'documentos/contrato_semestral.docx'))
+			document.merge(
+				INQUILINO_NOMBRE=self.inquilino.persona.getNombreApellido().upper(),
+				INQUILINO_DNI=self.inquilino.persona.dni.__str__(),
+				INQUILINO_NACIONALIDAD=self.inquilino.persona.nacionalidad,
+				PROPIEDAD_DIRECCION=self.propiedad.direccion,
+				PROPIEDAD_CARACTERISTICAS=self.propiedad.descripcion,
+				CONTRATO_FECHA_INICIO=format_date(self.fecha_inicio, format='long', locale='es'),
+				CONTRATO_FECHA_FIN=format_date(self.fecha_fin_cuarto_semestre, format='long', locale='es'),
+				CONTRATO_FECHA_MITAD=format_date(self.fecha_fin_segundo_semestre, format='long', locale='es'),
+				CONTRATO_FECHA_INICIO_SEGUNDO_SEMESTRE=format_date(self.fecha_inicio_segundo_semestre, format='long', locale='es'),
+				CONTRATO_FECHA_INICIO_TERCER_SEMESTRE=format_date(self.fecha_inicio_tercer_semestre, format='long', locale='es'),
+				CONTRATO_FECHA_INICIO_CUARTO_SEMESTRE=format_date(self.fecha_inicio_cuarto_semestre, format='long', locale='es'),
+				CONTRATO_FECHA_FIN_TERCER_SEMESTRE=format_date(self.fecha_fin_tercer_semestre, format='long', locale='es'),
+				CONTRATO_PERIODO1=format_date(self.fecha_inicio, format='long', locale='es') + ' al ' + format_date(self.fecha_fin_primer_semestre, format='long', locale='es'),
+				CONTRATO_CUOTA1=num2words(self.montos[0], lang='es').upper() + ' (${})'.format(self.montos[0]),
+				CONTRATO_CUOTA2=num2words(self.montos[1], lang='es').upper() + ' (${})'.format(self.montos[1]),
+				CONTRATO_CUOTA3=num2words(self.montos[2], lang='es').upper() + ' (${})'.format(self.montos[2]),
+				CONTRATO_CUOTA4=num2words(self.montos[3], lang='es').upper() + ' (${})'.format(self.montos[3]),
+				GARANTES=texto_garantes,
+				CONTRATO_FECHA_FIRMA=format_date(self.fecha_firma, format='long', locale='es'),
+				FIRMAS_INQUILINO=self.inquilino.persona.getNombreApellido().upper(),
+				GARANTE1_NOMBRE="GARANTE 1",
+				GARANTE2_NOMBRE="GARANTE 2",
+				GARANTE3_NOMBRE="GARANTE 3",
+				GARANTE4_NOMBRE="GARANTE 4",
+				GARANTE5_NOMBRE="GARANTE 5",
+			)
+		else:
+			document = MailMerge(os.path.join(TEMPLATES_DIR, 'documentos/contrato.docx'))
+			document.merge(
+				INQUILINO_NOMBRE=self.inquilino.persona.getNombreApellido().upper(),
+				INQUILINO_DNI=self.inquilino.persona.dni.__str__(),
+				INQUILINO_NACIONALIDAD=self.inquilino.persona.nacionalidad,
+				PROPIEDAD_DIRECCION=self.propiedad.direccion,
+				PROPIEDAD_CARACTERISTICAS=self.propiedad.descripcion,
+				CONTRATO_FECHA_INICIO=format_date(self.fecha_inicio, format='long', locale='es'),
+				CONTRATO_FECHA_FIN=format_date(self.fecha_fin_cuarto_semestre, format='long', locale='es'),
+				CONTRATO_FECHA_MITAD=format_date(self.fecha_inicio_tercer_semestre, format='long', locale='es'),
+				CONTRATO_PERIODO1=format_date(self.fecha_inicio, format='long', locale='es') + ' al ' + format_date(self.fecha_fin_segundo_semestre, format='long', locale='es'),
+				CONTRATO_CUOTA1=num2words(self.montos[0], lang='es').upper() + ' (${})'.format(self.montos[0]),
+				CONTRATO_CUOTA2=num2words(self.montos[2], lang='es').upper() + ' (${})'.format(self.montos[2]),
+				GARANTES=texto_garantes,
+				CONTRATO_FECHA_FIRMA=format_date(self.fecha_firma, format='long', locale='es'),
+				FIRMAS_INQUILINO=self.inquilino.persona.getNombreApellido().upper(),
+				GARANTE1_NOMBRE="GARANTE 1",
+				GARANTE2_NOMBRE="GARANTE 2",
+				GARANTE3_NOMBRE="GARANTE 3",
+				GARANTE4_NOMBRE="GARANTE 4",
+				GARANTE5_NOMBRE="GARANTE 5",
+			)
 		dir_guardado = os.path.join(MEDIA_ROOT, 'documentos/contratos/')
 		if not os.path.exists(dir_guardado):
 			os.makedirs(dir_guardado)
@@ -77,22 +136,15 @@ class Contrato(models.Model):
 	def generar_meses(self):
 		#generar el poder a travez de la propiedad
 		aux_fecha_vencimiento = datetime(self.fecha_inicio.year, self.fecha_inicio.month, 10)
-		print(self.monto_primer_anio)
 		#convertir el dia de vencimiento en parametro
-		for _ in range(12):#meses del primer año
-			mes = MesContrato()
-			mes.contrato = self
-			mes.fecha_vencimiento = aux_fecha_vencimiento
-			mes.monto = self.monto_primer_anio
-			mes.save(creando=True)
-			aux_fecha_vencimiento += relativedelta(months = 1)
-		for _ in range(12):
-			mes = MesContrato()
-			mes.contrato = self
-			mes.fecha_vencimiento = aux_fecha_vencimiento
-			mes.monto = self.monto_segundo_anio
-			mes.save(creando=True)
-			aux_fecha_vencimiento += relativedelta(months = 1)
+		for semestre in range(4):
+			for _ in range(6):
+				mes = MesContrato()
+				mes.contrato = self
+				mes.fecha_vencimiento = aux_fecha_vencimiento
+				mes.monto = self.montos[semestre]
+				mes.save(creando=True)
+				aux_fecha_vencimiento += relativedelta(months = 1)
 		return
 	
 	def generar_poder(self):
@@ -112,24 +164,50 @@ class Contrato(models.Model):
 		descrip = None
 		if self.propiedad.descripcion and self.propiedad.descripcion != '':
 			descrip = ' compuesta de: ' + self.propiedad.descripcion
-		document = MailMerge(os.path.join(TEMPLATES_DIR, 'documentos/autorizacion.docx'))
-		document.merge(
-			FECHA_FIRMA_TEXTO=format_date(date.today(), format='long', locale='es'),
-			DNI=str(self.propiedad.propietario.persona.dni),
-			DOMICILIO=domicilio,
-			CIUDAD=ciudad,
-			PROVINCIA=provincia,
-			TELEFONO=telefono,
-			PROPIEDAD_DIRECCION=self.propiedad.direccion,
-			PROPIEDAD_CIUDAD=self.propiedad.ciudad,
-			PROPIEDAD_PROVINCIA=self.propiedad.provincia,
-			PROPIEDAD_DESCRIPCION=self.propiedad.descripcion,
-			IMPORTE_MENSUAL=str(self.monto_primer_anio),
-			IMPORTE_PROPIETARIO=str((self.monto_primer_anio - self.monto_primer_anio * parametros.porcentaje_propietario).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)),
-			IMPORTE_MENSUAL_2=str(self.monto_segundo_anio),
-			IMPORTE_PROPIETARIO_2=str((self.monto_segundo_anio - self.monto_segundo_anio * parametros.porcentaje_propietario).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)),
-			PLAZO=str((self.fecha_fin - self.fecha_inicio).days) + ' días'
-		)
+		document = None
+		if self.es_semestral:
+			document = MailMerge(os.path.join(TEMPLATES_DIR, 'documentos/autorizacion_semestral.docx'))
+			document.merge(
+				FECHA_FIRMA_TEXTO=format_date(date.today(), format='long', locale='es'),
+				NOMBRE=self.propiedad.propietario.persona.getNombreApellido().upper(),
+				DNI=str(self.propiedad.propietario.persona.dni),
+				DOMICILIO=domicilio,
+				CIUDAD=ciudad,
+				PROVINCIA=provincia,
+				TELEFONO=telefono,
+				PROPIEDAD_DIRECCION=self.propiedad.direccion,
+				PROPIEDAD_CIUDAD=self.propiedad.ciudad,
+				PROPIEDAD_PROVINCIA=self.propiedad.provincia,
+				PROPIEDAD_DESCRIPCION=self.propiedad.descripcion,
+				IMPORTE_MENSUAL=str(self.montos[0]),
+				IMPORTE_PROPIETARIO=str((self.montos[0] - self.montos[0] * parametros.porcentaje_propietario).quantize(decimal.Decimal('10.55'), rounding=decimal.ROUND_DOWN)),
+				IMPORTE_MENSUAL_2=str(self.montos[1]),
+				IMPORTE_PROPIETARIO_2=str((self.montos[1] - self.montos[1] * parametros.porcentaje_propietario).quantize(decimal.Decimal('10.55'), rounding=decimal.ROUND_DOWN)),
+				IMPORTE_MENSUAL_3=str(self.montos[2]),
+				IMPORTE_PROPIETARIO_3=str((self.montos[2] - self.montos[2] * parametros.porcentaje_propietario).quantize(decimal.Decimal('10.55'), rounding=decimal.ROUND_DOWN)),
+				IMPORTE_MENSUAL_4=str(self.montos[3]),
+				IMPORTE_PROPIETARIO_4=str((self.montos[3] - self.montos[3] * parametros.porcentaje_propietario).quantize(decimal.Decimal('10.55'), rounding=decimal.ROUND_DOWN)),
+				PLAZO=str((self.fecha_fin_cuarto_semestre - self.fecha_inicio).days) + ' días'
+			)
+		else:
+			document = MailMerge(os.path.join(TEMPLATES_DIR, 'documentos/autorizacion.docx'))
+			document.merge(
+				FECHA_FIRMA_TEXTO=format_date(date.today(), format='long', locale='es'),
+				DNI=str(self.propiedad.propietario.persona.dni),
+				DOMICILIO=domicilio,
+				CIUDAD=ciudad,
+				PROVINCIA=provincia,
+				TELEFONO=telefono,
+				PROPIEDAD_DIRECCION=self.propiedad.direccion,
+				PROPIEDAD_CIUDAD=self.propiedad.ciudad,
+				PROPIEDAD_PROVINCIA=self.propiedad.provincia,
+				PROPIEDAD_DESCRIPCION=self.propiedad.descripcion,
+				IMPORTE_MENSUAL=str(self.montos[0]),
+				IMPORTE_PROPIETARIO=str((self.montos[0] - self.montos[0] * parametros.porcentaje_propietario).quantize(decimal.Decimal('10.55'), rounding=decimal.ROUND_DOWN)),
+				IMPORTE_MENSUAL_2=str(self.montos[2]),
+				IMPORTE_PROPIETARIO_2=str((self.montos[2] - self.montos[2] * parametros.porcentaje_propietario).quantize(decimal.Decimal('10.55'), rounding=decimal.ROUND_DOWN)),
+				PLAZO=str((self.fecha_fin_cuarto_semestre - self.fecha_inicio).days) + ' días'
+			)
 		dir_guardado = os.path.join(MEDIA_ROOT, 'documentos/contratos/')
 		if not os.path.exists(dir_guardado):
 			os.makedirs(dir_guardado)
@@ -176,7 +254,7 @@ class MesContrato(models.Model):
 			self.calcular_intereses()
 		if creando:
 			params = Parametros.cargar()
-			self.monto_propietario = (self.monto - self.monto * params.porcentaje_propietario).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
+			self.monto_propietario = (self.monto - self.monto * params.porcentaje_propietario).quantize(decimal.Decimal('10.55'), rounding=decimal.ROUND_DOWN)
 		super().save()
 
 	def a_diccionario(self):
@@ -301,7 +379,7 @@ class MesContrato(models.Model):
 		hoy = date.today()
 		if self.fecha_vencimiento <= hoy:
 			dias_interes = decimal.Decimal((hoy - self.fecha_vencimiento).days)
-			self.intereses = (self.totalACobrar(conIntereses=False) * parametros.interes_diario * dias_interes).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
+			self.intereses = (self.totalACobrar(conIntereses=False) * parametros.interes_diario * dias_interes).quantize(decimal.Decimal('0.1234'), rounding=decimal.ROUND_DOWN)
 		else:
 			self.intereses = decimal.Decimal(0.00)
 		return self.intereses
