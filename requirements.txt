@@ -7,8 +7,11 @@ django-widget-tweaks==1.4.2
 docx==0.2.4
 docx-mailmerge==0.4.0
 gunicorn==19.9.0
+lxml==4.6.2
 netaddr==0.7.19
 num2words==0.5.6
+Pillow==8.0.1
+psycopg2-binary==2.8.6
 python-dateutil==2.7.3
 pytz==2018.3
 six==1.11.0
