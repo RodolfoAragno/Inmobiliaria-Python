@@ -16,7 +16,6 @@ from email.header import Header
 import os
 import json
 import smtplib
-from decimal import Decimal
 
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT')
 
@@ -107,15 +106,15 @@ def cargar_contrato(request):
 			})
 		contrato.inquilino = Inquilino.objects.get(persona__dni=datos['dni_inquilino'])
 		contrato.fecha_inicio = date.fromtimestamp(int(datos['fecha_inicio']) / 1000);
-		contrato.montos = datos['montos']
+		contrato.monto_primer_anio = datos['monto']
 		contrato.save()
 		return redirect('ver_contrato', contrato.id)
 	else:
 		incremento = parametros.incremento_segundo_anio + 1
 		return render(request, 'contratos/cargar_contrato.html', {
 			'incremento_anual': str(incremento).replace(',', '.'),
-			'texto_incremento': str(((incremento - 1) * 100).quantize(Decimal('10.55'))).replace('.', ','),
-			'texto_porcentaje': str((parametros.porcentaje_propietario * 100).quantize(Decimal('10.55'))).replace('.', ',')
+			'texto_incremento': str((incremento - 1) * 100).replace('.', ','),
+			'texto_porcentaje': str(parametros.porcentaje_propietario * 100).replace('.', ',')
 		})
 
 def firmar_contrato(request, id_contrato):
@@ -154,13 +153,8 @@ def descargar_documento(request, id_contrato):
 	contrato.generar_documento()
 	with open(dir_guardado, 'rb') as fh:
 		response = HttpResponse(fh.read(), content_type="application/vnd.ms-word")
-		try:
-			filename = os.path.basename(dir_guardado).replace(' ', '_')
-			response['Content-Disposition'] = 'inline; filename=' + filename
-			return response
-		except:
-			response['Content-Disposition'] = 'inline; filename=' + quote(os.path.basename(dir_guardado))
-			return response
+		response['Content-Disposition'] = 'inline; filename=' + quote(os.path.basename(dir_guardado))
+		return response
 
 def descargar_autorizacion(request, id_contrato):
 	contrato = Contrato.objects.get(pk=id_contrato)
@@ -170,13 +164,8 @@ def descargar_autorizacion(request, id_contrato):
 	contrato.generar_poder()
 	with open(dir_guardado, 'rb') as fh:
 		response = HttpResponse(fh.read(), content_type="application/vnd.ms-word")
-		try:
-			filename = os.path.basename(dir_guardado).replace(' ', '_')
-			response['Content-Disposition'] = 'inline; filename=' + filename
-			return response
-		except:
-			response['Content-Disposition'] = 'inline; filename=' + quote(os.path.basename(dir_guardado))
-			return response
+		response['Content-Disposition'] = 'inline; filename=' + quote(os.path.basename(dir_guardado))
+		return response
 
 
 def open_connection(email, contrasenia):

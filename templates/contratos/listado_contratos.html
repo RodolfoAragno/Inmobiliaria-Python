@@ -34,8 +34,8 @@
             </thead>
             <tbody>
                 {% for contrato in contratos %}
-                <tr {% if contrato.fecha_fin_cuarto_semestre < hoy %}class="bg-invalido"{% endif %}>
-                    <td>{% if contrato.fecha_fin_cuarto_semestre < hoy %}<span class="badge badge-dark">FINALIZADO</span> {% endif %}{{ contrato.propiedad.direccion }}</td>
+                <tr {% if contrato.fecha_fin < hoy %}class="bg-invalido"{% endif %}>
+                    <td>{% if contrato.fecha_fin < hoy %}<span class="badge badge-dark">FINALIZADO</span> {% endif %}{{ contrato.propiedad.direccion }}</td>
                     <td>{{ contrato.propiedad.propietario.persona.getApellidoNombre }}</td>
                     <td>{{ contrato.inquilino.persona.getApellidoNombre }}</td>
                     <td>

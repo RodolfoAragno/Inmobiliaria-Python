@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from parametros.models import Parametros
 from django.core.exceptions import ValidationError
-from decimal import Decimal
 
 def parametros(request):
 	parametros = Parametros.cargar()
@@ -17,10 +16,9 @@ def parametros(request):
 			parametros.email_contrasenia = contr
 		try:
 			parametros.save()
-			parametros = Parametros.cargar()
-			parametros.porcentaje_propietario = (parametros.porcentaje_propietario * 100).quantize(Decimal('10.55'))
-			parametros.incremento_segundo_anio = (parametros.incremento_segundo_anio * 100).quantize(Decimal('10.55'))
-			parametros.interes_diario = (parametros.interes_diario * 100).quantize(Decimal('0.1234'))
+			parametros.porcentaje_propietario *= 100
+			parametros.incremento_segundo_anio *= 100
+			parametros.interes_diario *= 100
 			return render(request, 'parametros/parametros.html', {
 				'parametros': parametros,
 				'guardado': True
@@ -36,7 +34,7 @@ def parametros(request):
 	else:
 		if parametros.id is None:
 			return render(request, 'parametros/parametros.html')
-		parametros.porcentaje_propietario = (parametros.porcentaje_propietario * 100).quantize(Decimal('10.55'))
-		parametros.incremento_segundo_anio = (parametros.incremento_segundo_anio * 100).quantize(Decimal('10.55'))
-		parametros.interes_diario = (parametros.interes_diario * 100).quantize(Decimal('0.1234'))
+		parametros.porcentaje_propietario *= 100
+		parametros.incremento_segundo_anio *= 100
+		parametros.interes_diario *= 100
 		return render(request, 'parametros/parametros.html', {'parametros': parametros})

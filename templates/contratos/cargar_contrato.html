@@ -47,37 +47,19 @@
 						</tbody>
 					</table>
 				</li>
-				<li class="list-group-item d-flex justify-content-between"  onclick="seleccionoMontos()" v-bind:class="{ 'bg-pagado': montosGuardados.length === 4}">
+				<li class="list-group-item d-flex justify-content-between"  onclick="seleccionoMontos()" v-bind:class="{ 'bg-pagado': monto.primero > 0}">
 					<div>
 						<h6 class="my-0">Monto</h6>
 					</div>
 					<table class="table-sm">
-						<tbody v-if="montosGuardados[0] !== montosGuardados[1] && montosGuardados[2] !== montosGuardados[3]">
-							<tr>
-								<td>Primer semestre</td>
-								<td>$[[ montosGuardados[0] ? monedaATexto(montosGuardados[0]) : monedaATexto(0) ]]</td>
-							</tr>
-							<tr>
-								<td>Segundo semestre</td>
-								<td>$[[ montosGuardados[1] ? monedaATexto(montosGuardados[1]) : monedaATexto(0) ]]</td>
-							</tr>
-							<tr>
-								<td>Tercer semestre</td>
-								<td>$[[ montosGuardados[2] ? monedaATexto(montosGuardados[2]) : monedaATexto(0) ]]</td>
-							</tr>
-							<tr>
-								<td>Cuarto semestre</td>
-								<td>$[[ montosGuardados[3] ? monedaATexto(montosGuardados[3]) : monedaATexto(0) ]]</td>
-							</tr>
-						</tbody>
-						<tbody v-else>
+						<tbody>
 							<tr>
 								<td>Primer año</td>
-								<td>$[[ montosGuardados[0] ? monedaATexto(montosGuardados[0]) : monedaATexto(0) ]]</td>
+								<td>$[[ monedaATexto(monto.primero) ]]</td>
 							</tr>
 							<tr>
 								<td>Segundo año</td>
-								<td>$[[ montosGuardados[2] ? monedaATexto(montosGuardados[2]) : monedaATexto(0) ]]</td>
+								<td>$[[ monedaATexto(monto.segundo) ]]</td>
 							</tr>
 						</tbody>
 					</table>
@@ -239,41 +221,16 @@
 		<!-- FORMULARIO MONTOS -->
 		<div class="col-md-8 order-md-1 formulario" id="formulario_montos" style="display: none">
 			<h4 class="mb-3">Montos</h4>
+			<h6>Monto a pagar durante el primer año:</h6>
+			<div class="row">
+				<div class="col-md-5"><input type="text" class="form-control" id="form_monto_1" v-on:keyup.enter="setMonto"></div>
+				<div class="col-auto"><button type="button" class="btn btn-primary" v-on:click="setMonto">Guardar</button></div>
+			</div>
+			<small>El monto a pagar del segundo año se calcula automáticamente.</small><br>
 			<ul>
 				<li>Incremento anual: {{ texto_incremento }}%.</li>
 				<li>Comisión correspondiente a la inmobiliaria: {{ texto_porcentaje }}%.</li>
-				<li>Completar el primer campo y apretar en <button type="button" class="btn btn-link btn-sm" v-on:click="calcularSemestres">Calcular semestres</button> para calcular automáticamente el aumento anual.</li>
 			</ul>
-			<form class="col-12 col-md-6">
-				<div class="form-group row">
-					<label for="form_monto_1" class="col-sm-2 col-form-label">Monto 1er semestre</label>
-					<div class="col-sm-10">
-						<input type="text" class="form-control" id="form_monto_1" v-model="montos[0]">
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="form_monto_2" class="col-sm-2 col-form-label">Monto 2do semestre</label>
-					<div class="col-sm-10">
-						<input type="text" class="form-control" id="form_monto_2" v-model="montos[1]">
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="form_monto_3" class="col-sm-2 col-form-label">Monto 3er semestre</label>
-					<div class="col-sm-10">
-						<input type="text" class="form-control" id="form_monto_3" v-model="montos[2]">
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="form_monto_4" class="col-sm-2 col-form-label">Monto 4to semestre</label>
-					<div class="col-sm-10">
-						<input type="text" class="form-control" id="form_monto_4" v-model="montos[3]">
-					</div>
-				</div>
-				<div class="row justify-content-between">
-					<div class="col-auto"><button type="button" class="btn btn-link" v-on:click="calcularSemestres">Calcular semestres</button></div>
-					<div class="col-auto"><button type="button" class="btn btn-primary" v-on:click="setMonto">Guardar</button></div>
-				</div>
-			</form>
 		</div>
 	</div>
 	<!-- Los formularios van arriba de este /div -->
@@ -297,10 +254,9 @@
 			propiedad: {direccion: 'NO SELECCIONADA', nombre_propietario: 'NO SELECCIONADO'},
 			inquilino: {nombre: 'NO SELECCIONADO'},
 			detalles: {fecha_fin: '', fecha_inicio: ''},
+			monto: {primero: 0.00, segundo: 0.00},
 			listado_propiedades: [],
-			listado_inquilinos: [],
-			montos: [],
-			montosGuardados: [],
+			listado_inquilinos: []
 		},
 		created: function() {
 			function getQueryStringValue (key) {
@@ -341,28 +297,13 @@
 		},
 		computed: {
 			completo() {
-				return (this.propiedad.id && this.inquilino.dni && this.detalles.fecha_inicio != '' && this.montosGuardados[0] > 0);
+				return (this.propiedad.id && this.inquilino.dni && this.detalles.fecha_inicio != '' && this.monto.primero > 0);
 			},
 			en_blanco() {
-				return (this.propiedad.id || this.inquilino.dni || this.detalles.fecha_inicio != '' || this.montosGuardados[0] > 0)
-			},
+				return (this.propiedad.id || this.inquilino.dni || this.detalles.fecha_inicio != '' || this.monto.primero > 0)
+			}
 		},
 		methods: {
-			calcularSemestres: function () {
-				const montoPrimerSemestre = this.montos[0];
-				if (montoPrimerSemestre && montoPrimerSemestre !== '') {
-					const monto = parseFloat(montoPrimerSemestre);
-					const incremento = parseFloat('{{incremento_anual}}') - 1;
-					this.montos = [
-						monto,
-						monto,
-						monto + monto * incremento,
-						monto + monto * incremento,
-					];
-				} else {
-					this.montos = ['', '', '', '']
-				}
-			},
 			textoFecha: function (unixt) {
 				if(unixt) {
 					var fecha = new Date(unixt);
@@ -371,7 +312,6 @@
 				return '';
 			},
 			monedaATexto: function (moneda){
-				if (typeof(moneda) !== "number") moneda = parseFloat(moneda);
 				var txt = moneda.toFixed(2)
 				var res = txt.replace('.',',')
 				return res
@@ -389,15 +329,15 @@
 				this.detalles.fecha_fin = add2Anios(this.detalles.fecha_inicio);
 			},
 			setMonto: function(){
-				let error = false;
-				for (let i = 0; i < 4; i++) {
-					if (this.montos[i] === undefined || this.montos[i] === '') error = true;
+				var valor_monto = parseFloat($('#form_monto_1').val().replace(',', '.'));
+				if(valor_monto > 0) {
+					this.monto.primero = valor_monto;
+					this.monto.segundo = (this.monto.primero * parseFloat("{{ incremento_anual }}"));
 				}
-				if (error) {
-					alert("Debe completar los cuatro semestres.");
-					return;
-				};
-				this.montosGuardados = this.montos.map(m => m);
+				else {
+					this.monto.primero = 0.00;
+					this.monto.segundo = 0.00;
+				}
 			},
 			quitarPropiedad: function() {
 				this.propiedad = {direccion: 'NO SELECCIONADA', nombre_propietario: 'NO SELECCIONADO'}
@@ -429,7 +369,7 @@
 						id_propiedad: this.propiedad.id,
 						dni_inquilino: this.inquilino.dni,
 						fecha_inicio: this.detalles.fecha_inicio,
-						montos: this.montosGuardados,
+						monto: this.monto.primero
 					})
 				)
 				aviso_de_salida = false;
