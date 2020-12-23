@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from parametros.models import Parametros
+from contratos.models import MesContrato
 from django.core.exceptions import ValidationError
+from django.db.models import F
 
 def parametros(request):
 	parametros = Parametros.cargar()
@@ -12,6 +14,7 @@ def parametros(request):
 		parametros.email_asunto = request.POST.get('email_asunto', None)
 		parametros.email_mensaje = request.POST.get('email_mensaje', None)
 		contr = request.POST.get('email_contrasenia', None)
+		
 		if contr is not None and contr != '':
 			parametros.email_contrasenia = contr
 		try:
@@ -19,6 +22,9 @@ def parametros(request):
 			parametros.porcentaje_propietario *= 100
 			parametros.incremento_segundo_anio *= 100
 			parametros.interes_diario *= 100
+			#recalculo de porcentajes a pagar para el propietario
+			MesContrato.objects.filter(fecha_pagado_propietario=None).filter(contrato__activo=1).update(monto_propietario = F('monto') - (F('monto') * parametros.porcentaje_propietario / 100))
+			
 			return render(request, 'parametros/parametros.html', {
 				'parametros': parametros,
 				'guardado': True
