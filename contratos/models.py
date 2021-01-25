@@ -133,9 +133,9 @@ class Contrato(models.Model):
 		dir_guardado = os.path.join(MEDIA_ROOT, 'documentos/contratos/')
 		if not os.path.exists(dir_guardado):
 			os.makedirs(dir_guardado)
-		document.write(
-			os.path.join(dir_guardado, 'autorizacion_{}_{}.docx'.format(self.propiedad.propietario.persona.apellido, self.propiedad.direccion))
-		)
+		save_path = os.path.join(dir_guardado, 'autorizacion_{}_{}.docx'.format(self.propiedad.propietario.persona.apellido, self.propiedad.direccion))
+		document.write(save_path)
+		print(save_path)
 		return
 
 def convertir_a_float(num):

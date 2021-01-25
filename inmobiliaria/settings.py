@@ -17,8 +17,8 @@ if 'DATABASE_URL' not in os.environ:
 		f.close()
 	raise Exception('No se ha fijado la url de la base de datos.')
 
-DEBUG = False
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'gazze.in']
+DEBUG = True
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'gazze.in','*']
 INSTALLED_APPS = [
     'django.contrib.auth',
 	'django.contrib.staticfiles',
@@ -59,7 +59,15 @@ TEMPLATES = [
     },
 ]
 DATABASES = {
-    'default': dj_database_url.config(default='postgres://')
+    
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'inmobiliaria',
+        'USER': 'django_user',
+        'PASSWORD': 'inmob.GazzeDB-2018',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }
 AUTH_PASSWORD_VALIDATORS = [
     {
