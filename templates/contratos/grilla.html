@@ -33,7 +33,7 @@
 			</tr>
 		</thead>
 		<tr v-for="(mes, index) in dataGrilla"
-			v-bind:class="{ 'segundo-anio': index == 12, 'bg-pagado': mes.pagado_inquilino && mes.pagado_propietario}">
+			v-bind:class="{ 'segundo-anio': index % 12 == 0 && index > 0 , 'bg-pagado': mes.pagado_inquilino && mes.pagado_propietario}">
 			<td>[[ mes.mes ]]</td>
 			<td v-bind:class="{ 'bg-pagado': mes.pagado_inquilino, 'bg-no-pagado': mes.intereses > 0 && !mes.pagado_inquilino }">$[[ monedaATexto(mes.inquilino) ]]</td>
 			
@@ -82,7 +82,7 @@
 					<div v-if="puedePagar(index, mes)">($[[ totalAPagar(mes) ]])</div>
 				</button>
 				{% else %}
-				No pagado
+				Contrato inactivo
 				{% endif %}
 			</td>
 			<td v-bind:class="{ 'bg-pagado': mes.pagado_propietario }">
@@ -90,7 +90,7 @@
 				{% if contrato.activo %}
 				<button class="btn btn-primary btn-sm" v-else  v-on:click="cobrarPropietario(mes)">Pagar<br>($[[ totalPropietario(mes) ]])</button>
 				{% else %}
-				No pagado
+				Contrato inactivo
 				{% endif %}
 			</td>
 		</tr>

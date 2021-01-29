@@ -58,8 +58,9 @@
 								<td>$[[ monedaATexto(monto.primero) ]]</td>
 							</tr>
 							<tr>
+								<!--
 								<td>Segundo año</td>
-								<td>$[[ monedaATexto(monto.segundo) ]]</td>
+								<td>$[[ monedaATexto(monto.segundo) ]]</td> -->
 							</tr>
 						</tbody>
 					</table>
@@ -215,6 +216,11 @@
 				data-view="months"
 				data-date-format="yyyy/mm/dd" 
 				id="form_detalles_inicio"></div>
+			<!--tomamos la cantidad de años de duracion del contrato para calcular su fecha de vencimiento-->
+			<h6>Cantidad de años de duración del contrato:</h6>
+			<div class="col-md-4"><input type="text" class="form-control" id="form_anio_duracion_contrato"></div>
+			<br>
+				
 			<button type="button" class="btn btn-primary" v-on:click="setFecha()">Guardar</button>
 		</div>
 
@@ -226,9 +232,10 @@
 				<div class="col-md-5"><input type="text" class="form-control" id="form_monto_1" v-on:keyup.enter="setMonto"></div>
 				<div class="col-auto"><button type="button" class="btn btn-primary" v-on:click="setMonto">Guardar</button></div>
 			</div>
-			<small>El monto a pagar del segundo año se calcula automáticamente.</small><br>
+			<!--<small>El monto a pagar del segundo año se calcula automáticamente.</small><br>-->
 			<ul>
-				<li>Incremento anual: {{ texto_incremento }}%.</li>
+				<!--<li>Incremento anual: {{ texto_incremento }}%.</li>-->
+				
 				<li>Comisión correspondiente a la inmobiliaria: {{ texto_porcentaje }}%.</li>
 			</ul>
 		</div>
@@ -256,7 +263,8 @@
 			detalles: {fecha_fin: '', fecha_inicio: ''},
 			monto: {primero: 0.00, segundo: 0.00},
 			listado_propiedades: [],
-			listado_inquilinos: []
+			listado_inquilinos: [],
+			anios_contrato: 0
 		},
 		created: function() {
 			function getQueryStringValue (key) {
@@ -297,10 +305,10 @@
 		},
 		computed: {
 			completo() {
-				return (this.propiedad.id && this.inquilino.dni && this.detalles.fecha_inicio != '' && this.monto.primero > 0);
+				return (this.propiedad.id && this.inquilino.dni && this.detalles.fecha_inicio != '' && this.monto.primero > 0 && this.anios_contrato > 0);
 			},
 			en_blanco() {
-				return (this.propiedad.id || this.inquilino.dni || this.detalles.fecha_inicio != '' || this.monto.primero > 0)
+				return (this.propiedad.id || this.inquilino.dni || this.detalles.fecha_inicio != '' || this.monto.primero > 0 || this.anios_contrato >0);
 			}
 		},
 		methods: {
@@ -326,13 +334,20 @@
 			},
 			setFecha: function() {
 				this.detalles.fecha_inicio = new Date($('#form_detalles_inicio').val() + ' 12:00').getTime();
-				this.detalles.fecha_fin = add2Anios(this.detalles.fecha_inicio);
+				
+
+				//this.detalles.fecha_fin = add2Anios(this.detalles.fecha_inicio);
+				anios_contrato=$('#form_anio_duracion_contrato').val();
+				//simulamos cuando seria la fecha final del contrato
+				this.detalles.fecha_fin = addAnios(this.detalles.fecha_inicio, anios_contrato);
 			},
 			setMonto: function(){
 				var valor_monto = parseFloat($('#form_monto_1').val().replace(',', '.'));
 				if(valor_monto > 0) {
 					this.monto.primero = valor_monto;
-					this.monto.segundo = (this.monto.primero * parseFloat("{{ incremento_anual }}"));
+					//this.monto.segundo = (this.monto.primero * parseFloat("{{ incremento_anual }}"));
+					//Dejamos el monto.segundo igual a monto.primero
+					this.monto.segundo = valor_monto;
 				}
 				else {
 					this.monto.primero = 0.00;
@@ -392,9 +407,10 @@
 			app.listado_inquilinos = respuesta
 		})
 	})
-	function add2Anios(date) {
+	//agrega una cantidad especifica de años a una fecha dada
+	function addAnios(date,anios) {
 		var result = new Date(date);
-		result.setFullYear(result.getFullYear() + 2);
+		result.setFullYear(result.getFullYear() + parseInt(anios));
 		result.setDate(result.getDate() - 1);
 		return result.getTime();
 	}

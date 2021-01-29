@@ -108,6 +108,7 @@ def cargar_contrato(request):
 		contrato.fecha_inicio = date.fromtimestamp(int(datos['fecha_inicio']) / 1000);
 		contrato.monto_primer_anio = datos['monto']
 		contrato.save()
+		contrato.generar_meses(datos['anios_contrato'])
 		return redirect('ver_contrato', contrato.id)
 	else:
 		incremento = parametros.incremento_segundo_anio + 1
@@ -122,7 +123,7 @@ def firmar_contrato(request, id_contrato):
 	if request.method == 'POST':
 		contrato.fecha_firma = datetime.strptime(request.POST.get('fecha_firma'), "%d/%m/%Y")
 		contrato.save()
-		contrato.generar_meses()
+		#contrato.generar_meses()
 		return redirect('ver_contrato', id_contrato)
 	else:
 		return render(request, 'contratos/firmar_contrato.html', {'contrato': contrato})
