@@ -264,7 +264,7 @@
 			monto: {primero: 0.00, segundo: 0.00},
 			listado_propiedades: [],
 			listado_inquilinos: [],
-			anios_contrato: 0
+			anios_contrato: 2
 		},
 		created: function() {
 			function getQueryStringValue (key) {
@@ -305,10 +305,10 @@
 		},
 		computed: {
 			completo() {
-				return (this.propiedad.id && this.inquilino.dni && this.detalles.fecha_inicio != '' && this.monto.primero > 0 && this.anios_contrato > 0);
+				return (this.propiedad.id && this.inquilino.dni && this.detalles.fecha_inicio != '' && this.monto.primero > 0 && this.detalles.fecha_fin != '');
 			},
 			en_blanco() {
-				return (this.propiedad.id || this.inquilino.dni || this.detalles.fecha_inicio != '' || this.monto.primero > 0 || this.anios_contrato >0);
+				return (this.propiedad.id || this.inquilino.dni || this.detalles.fecha_inicio != '' || this.monto.primero > 0 || this.detalles.fecha_fin != '');
 			}
 		},
 		methods: {
@@ -334,12 +334,17 @@
 			},
 			setFecha: function() {
 				this.detalles.fecha_inicio = new Date($('#form_detalles_inicio').val() + ' 12:00').getTime();
+				//Obtenemos los años del contrato, si es un numero menor a 1 lo dejamos por defecto en 3 años
 				
-
+				this.anios_contrato = parseInt($('#form_anio_duracion_contrato').val());
+				
+				//if(anios_contrato.isNaN())	
+					//anios_contrato=3;
+				
 				//this.detalles.fecha_fin = add2Anios(this.detalles.fecha_inicio);
-				anios_contrato=$('#form_anio_duracion_contrato').val();
+				//anios_contrato=$('#form_anio_duracion_contrato').val();
 				//simulamos cuando seria la fecha final del contrato
-				this.detalles.fecha_fin = addAnios(this.detalles.fecha_inicio, anios_contrato);
+				this.detalles.fecha_fin = addAnios(this.detalles.fecha_inicio, this.anios_contrato);
 			},
 			setMonto: function(){
 				var valor_monto = parseFloat($('#form_monto_1').val().replace(',', '.'));
@@ -384,7 +389,8 @@
 						id_propiedad: this.propiedad.id,
 						dni_inquilino: this.inquilino.dni,
 						fecha_inicio: this.detalles.fecha_inicio,
-						monto: this.monto.primero
+						monto: this.monto.primero,
+						anios_contrato: this.anios_contrato
 					})
 				)
 				aviso_de_salida = false;
@@ -409,6 +415,7 @@
 	})
 	//agrega una cantidad especifica de años a una fecha dada
 	function addAnios(date,anios) {
+		
 		var result = new Date(date);
 		result.setFullYear(result.getFullYear() + parseInt(anios));
 		result.setDate(result.getDate() - 1);

@@ -78,11 +78,13 @@ class Contrato(models.Model):
 		#generar el poder a travez de la propiedad
 		aux_fecha_vencimiento = datetime(self.fecha_inicio.year, self.fecha_inicio.month, 10)
 		print(self.monto_primer_anio)
+		print(anios)
 		#convertir el dia de vencimiento en parametro
 		for _ in range(12*anios):#meses del primer año
 			mes = MesContrato()
 			mes.contrato = self
 			mes.fecha_vencimiento = aux_fecha_vencimiento
+			print(mes.fecha_vencimiento)
 			mes.monto = self.monto_primer_anio
 			mes.save(creando=True)
 			aux_fecha_vencimiento += relativedelta(months = 1)

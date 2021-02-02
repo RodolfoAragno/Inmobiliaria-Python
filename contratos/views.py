@@ -108,7 +108,8 @@ def cargar_contrato(request):
 		contrato.fecha_inicio = date.fromtimestamp(int(datos['fecha_inicio']) / 1000);
 		contrato.monto_primer_anio = datos['monto']
 		contrato.save()
-		contrato.generar_meses(datos['anios_contrato'])
+		print(datos['anios_contrato'])
+		contrato.generar_meses(int(datos['anios_contrato']))
 		return redirect('ver_contrato', contrato.id)
 	else:
 		incremento = parametros.incremento_segundo_anio + 1
