@@ -35,7 +35,11 @@
 		<tr v-for="(mes, index) in dataGrilla"
 			v-bind:class="{ 'segundo-anio': index % 12 == 0 && index > 0 , 'bg-pagado': mes.pagado_inquilino && mes.pagado_propietario}">
 			<td>[[ mes.mes ]]</td>
-			<td v-bind:class="{ 'bg-pagado': mes.pagado_inquilino, 'bg-no-pagado': mes.intereses > 0 && !mes.pagado_inquilino }">$[[ monedaATexto(mes.inquilino) ]]</td>
+			<td v-bind:class="{ 'bg-pagado': mes.pagado_inquilino, 'bg-no-pagado': mes.intereses > 0 && !mes.pagado_inquilino }">$[[ monedaATexto(mes.inquilino) ]]  
+			<button class="btn btn-link btn-sm text-info" v-on:click="variosPropietario(index)" v-if="!mes.pagado_inquilino && !mes.pagado_propietario && index % 12 == 0	">
+					<i data-feather="edit"></i>
+				</button>
+				 </td>
 			
 			<td v-bind:class="{ 'bg-pagado': mes.pagado_propietario }">
 				$[[ totalPropietario(mes) ]]
