@@ -81,6 +81,21 @@ def meses_contrato(request, id_contrato):
 			resultado.append(mes.a_diccionario())
 		return JsonResponse(resultado, safe=False)
 
+
+def actualizar_monto(request):
+	if request.method == 'POST':
+		id_mes = request.POST.get('id_mes')
+		mes = MesContrato.objects.get(pk=id_mes)
+		monto = request.POST.get('monto')
+		
+		for mes_a_editar in MesContrato.objects.filter('contrato'=mes.contrato).filter('id_mes__gte'=mes.id_mes):
+			mes_a_editar.monto = monto
+			mes_a_editar.save(True)
+			
+		pass# guardar mes que cambia
+	
+
+
 def propiedades(request):
 	id = request.GET.get('id')
 	if id is not None:

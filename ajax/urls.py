@@ -3,6 +3,7 @@ from ajax import views
 
 urlpatterns = [
 	path('modificar_mes', views.modificar_mes),
+	path('actualizar_monto', views.actualizar_monto),
 	path('meses/<int:id_contrato>', views.meses_contrato),
 	path('propiedades', views.propiedades),
 	path('inquilinos', views.inquilinos),
