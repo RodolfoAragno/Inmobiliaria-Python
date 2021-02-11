@@ -36,7 +36,7 @@
 			v-bind:class="{ 'segundo-anio': index % 12 == 0 && index > 0 , 'bg-pagado': mes.pagado_inquilino && mes.pagado_propietario}">
 			<td>[[ mes.mes ]]</td>
 			<td v-bind:class="{ 'bg-pagado': mes.pagado_inquilino, 'bg-no-pagado': mes.intereses > 0 && !mes.pagado_inquilino }">$[[ monedaATexto(mes.inquilino) ]]  
-			<button class="btn btn-link btn-sm text-info" v-on:click="variosPropietario(index)" v-if="!mes.pagado_inquilino && !mes.pagado_propietario && index % 12 == 0	">
+			<button class="btn btn-link btn-sm text-info" v-on:click="modificarMontoMeses(index)" v-if="!mes.pagado_inquilino && !mes.pagado_propietario && index % 12 == 0	">
 					<i data-feather="edit"></i>
 				</button>
 				 </td>
@@ -302,7 +302,7 @@
 				});
 			},
 			cambiaCelda: function(i, j) {
-				if(i < 0 || i > 24 || j < 3 || j > 6) return;
+				//if(i < 0 || i > 24 || j < 3 || j > 6) return;
 				var msg = ''
 				var impuestos = ['tasa', 'agua', 'api', 'expensas']
 				var impuesto_actual = impuestos[j-3]
@@ -334,6 +334,41 @@
 								temp[i] = respuesta
 								app.dataGrilla = []
 								app.dataGrilla = temp
+							});
+						}
+					}
+				});
+			},
+			modificarMontoMeses: function(i) {
+				//if(i < 0 || i > 24 || j < 3 || j > 6) return;
+				var msg = ''
+				//var impuestos = ['tasa', 'agua', 'api', 'expensas']
+				//var impuesto_actual = impuestos[j-3]
+				msg = 'Actualizar monto - ' + this.dataGrilla[i].mes
+				//var valor_actual = this.monedaATexto(this.dataGrilla[i][impuesto_actual])
+				//if(valor_actual < "1") valor_actual = ""
+				bootbox.prompt({
+					title: msg,
+					inputType: 'text',
+					value: 0,
+					callback: function(nuevoValor){
+						if(nuevoValor != null){
+							var val = app.textoAMoneda(nuevoValor)
+							//console.log('setting ' + i + ' imp: ' + impuesto_actual + ' to: ' + val)
+							//app.dataGrilla[i][impuesto_actual] = val
+
+							var csrftoken = getCookie('csrftoken');
+							$.ajax({
+								method: "POST",
+								url: "/ajax/actualizar_monto",
+								data: {
+									id_mes: app.dataGrilla[i].id_mes,
+									//impuesto: impuesto_actual,
+									monto: val,
+									'csrfmiddlewaretoken': '{{ csrf_token }}'
+								}
+							}).done(function(respuesta) {
+								app.getMeses()
 							});
 						}
 					}
