@@ -218,7 +218,7 @@
 				id="form_detalles_inicio"></div>
 			<!--tomamos la cantidad de años de duracion del contrato para calcular su fecha de vencimiento-->
 			<h6>Cantidad de años de duración del contrato:</h6>
-			<div class="col-md-4"><input type="text" class="form-control" id="form_anio_duracion_contrato"></div>
+			<div class="col-md-4"><input type="number" class="form-control" id="form_anio_duracion_contrato"></div>
 			<br>
 				
 			<button type="button" class="btn btn-primary" v-on:click="setFecha()">Guardar</button>
@@ -338,8 +338,8 @@
 				
 				this.anios_contrato = parseInt($('#form_anio_duracion_contrato').val());
 				
-				//if(anios_contrato.isNaN())	
-					//anios_contrato=3;
+				if(this.anios_contrato < 1)	
+					this.anios_contrato=3;
 				
 				//this.detalles.fecha_fin = add2Anios(this.detalles.fecha_inicio);
 				//anios_contrato=$('#form_anio_duracion_contrato').val();
