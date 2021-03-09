@@ -23,10 +23,11 @@
                 </form>
             </div>
         </div>
+        
         <table class="table table-bordered text-center" id="tablaContratos">
             <thead class="thead-dark">
                 <tr>
-                    <th>Dirección propiedad</th>
+                    <th>Dirección propiedad {{oficinas}}</th>
                     <th>Propietario</th>
                     <th>Inquilino</th>
                     <th></th>
@@ -46,6 +47,9 @@
                             <button type="button" class="btn btn-success btn-sm">Facturación</button>
                         </a>
                     </td>
+                    <td hidden>{{contrato.oficina}}
+
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -55,7 +59,7 @@
 {% block javascript %}
 <script>
     function busquedaFunction() {
-        var input, filter, table, tr, td, i;
+        var input, filter, table, tr, td, i, oficina;
         input = document.getElementById("busquedaContratos");
         filter = input.value.toLowerCase();
         table = document.getElementById("tablaContratos");
@@ -63,8 +67,9 @@
         for (i = 1; i < tr.length; i++) {
             td = tr[i].getElementsByTagName("td")[0].innerHTML.toLowerCase() + ' ' +
                 tr[i].getElementsByTagName("td")[1].innerHTML.toLowerCase() + ' ' + tr[i].getElementsByTagName("td")[2].innerHTML.toLowerCase();
+            oficina = tr[i].getElementsByTagName("td")[4].innerHTML
             if (td) {
-                if (td.indexOf(filter) > -1) {
+                if (td.indexOf(filter) > -1 && oficina.indexOf('ROSA') > -1) {
                     tr[i].style.display = "";
                 } else {
                     tr[i].style.display = "none";
@@ -72,5 +77,7 @@
             }
         }
     }
+
+    busquedaFunction()
 </script>
 {% endblock javascript %}
