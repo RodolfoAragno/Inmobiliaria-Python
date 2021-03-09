@@ -3,7 +3,6 @@ venv/
 *.pyc
 staticfiles
 .env
-migrations/
 gazze_documentos/
 __pycache__/
 error-log.txt
