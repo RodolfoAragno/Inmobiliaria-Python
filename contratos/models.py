@@ -15,19 +15,33 @@ TEMPLATES_DIR = os.environ.get('TEMPLATES_DIR')
 
 class Contrato(models.Model):
 	"""Model definition for Contrato."""
+	
+	#
+	#CONSTANTES DEL MODELO 
+	#
+	
+	OFICINAS = [
+        ('SAFE', 'Santa Fe'),
+        ('ROSA', 'Rosario'),
+        ('RECO', 'Reconquista'),
+        ]
+        
+        
 	inquilino = models.ForeignKey(Inquilino, on_delete=models.DO_NOTHING, related_name="contratos")
 	propiedad = models.ForeignKey(Propiedad, on_delete=models.DO_NOTHING, related_name="contratos")
 	fecha_inicio = models.DateField(auto_now=False, auto_now_add=False)
 	fecha_mitad = models.DateField(auto_now=False, auto_now_add=False)# fecha_inicio + relativedelta(years=1) - relativedelta(days=1)
 	fecha_fin = models.DateField(auto_now=False, auto_now_add=False)
-	
 	monto_primer_anio = models.DecimalField(max_digits=12, decimal_places=2) # monto fijo mensual del alquiler
 	monto_segundo_anio = models.DecimalField(max_digits=12, decimal_places=2)
-
 	fecha_firma = models.DateField(null=True, default=None)
-	
 	activo = models.BooleanField(default=True)# para borrarlos
 	garantes = models.ManyToManyField(Persona, related_name='+')
+	
+	oficina = models.CharField( max_length=4, choices=OFICINAS,default='SAFE',)
+	cobrar_tasa_propietario = models.BooleanField(default=False)
+	cobrar_agua_propietario = models.BooleanField(default=False)
+	cobrar_api_propietariooo = models.BooleanField(default=False)
 	
 	def save(self, *args, **kwargs):
 		parametros = Parametros.cargar()
@@ -160,6 +174,7 @@ class MesContrato(models.Model):
 	#impuestos y servicios definidos	
 	api = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
 	expensas = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
+	expensas_ext = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=True)
 	agua = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
 	tasa = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
 	intereses = models.DecimalField(max_digits=12, decimal_places=2, default=0)

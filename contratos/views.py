@@ -116,7 +116,8 @@ def cargar_contrato(request):
 		return render(request, 'contratos/cargar_contrato.html', {
 			'incremento_anual': str(incremento).replace(',', '.'),
 			'texto_incremento': str((incremento - 1) * 100).replace('.', ','),
-			'texto_porcentaje': str(parametros.porcentaje_propietario * 100).replace('.', ',')
+			'texto_porcentaje': str(parametros.porcentaje_propietario * 100).replace('.', ','),
+			'oficinas': Contrato.OFICINAS
 		})
 
 def firmar_contrato(request, id_contrato):
