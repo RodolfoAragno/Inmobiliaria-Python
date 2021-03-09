@@ -13,6 +13,13 @@
             </div>
             <div class="col-md-3">
                 <form>
+                
+                    <select name="gender" class="selectpicker" data-title="Select Gender" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+		    {% for codigo,nombre in oficinas %}
+		       <option value="{{ codigo }}">{{ nombre }}</option>
+    			{% endfor %}
+    			</select>
+                
                     <div class="form-group row">
                         <label for="busquedaContratos" class="col-form-label">Búsqueda:</label>
                         <div class="col-sm-10">

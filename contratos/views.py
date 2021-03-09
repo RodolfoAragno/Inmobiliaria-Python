@@ -82,7 +82,8 @@ def grilla(request, id_contrato):
 def listado_contratos(request):
 	return render(request, 'contratos/listado_contratos.html', {
 		'contratos': Contrato.objects.prefetch_related().filter(activo=True).order_by("id"),
-		'hoy': date.today()
+		'hoy': date.today(),
+		'oficinas': Contrato.OFICINAS
 	})
 
 def ver_contrato(request, id_contrato):
