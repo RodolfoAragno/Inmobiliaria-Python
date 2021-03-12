@@ -206,22 +206,66 @@
 		</div>
 
 		<!-- FORMULARIO DETALLES -->
-		<div class="col-md-8 order-md-1 formulario" id="formulario_detalles" style="display: none">
-			<h4 class="mb-3">Detalles</h4>
-			<h6>Fecha de inicio del contrato</h6>
-			<div
-				class="datepicker-here inline mb-3"
-				data-language='es'
-				data-min-view="months"
-				data-view="months"
-				data-date-format="yyyy/mm/dd" 
-				id="form_detalles_inicio"></div>
-			<!--tomamos la cantidad de años de duracion del contrato para calcular su fecha de vencimiento-->
-			<h6>Cantidad de años de duración del contrato:</h6>
-			<div class="col-md-4"><input type="number" class="form-control" id="form_anio_duracion_contrato"></div>
-			<br>
-				
-			<button type="button" class="btn btn-primary" v-on:click="setFecha()">Guardar</button>
+
+		<div class="col-md-8 order-md-1 formulario " id="formulario_detalles" style="display: none">
+			<div class="row justify-content-center">
+				<h4 class="mb-3">Detalles</h4>
+			</div>
+			
+			<div class= "row text-center  ">
+				<div class="col-md-4 justify-content-center">
+					
+					<h6>Fecha de inicio del contrato</h6>
+					<div
+						class="datepicker-here inline mb-3 col-md-3"
+						data-language='es'
+						data-min-view="months"
+						data-view="months"
+						data-date-format="yyyy/mm/dd" 
+						id="form_detalles_inicio"></div>
+				</div>
+				<div class="col-md-4 justify-content-center">
+						
+				<!--tomamos la cantidad de años de duracion del contrato para calcular su fecha de vencimiento-->
+					<div>
+						<h6>Cantidad de años de duración del contrato:</h6>
+						<input type="number" class="form-control" id="form_anio_duracion_contrato" >
+					</div>
+				<!--Ingresamos las localidades-->
+					<div>
+						<h6>Localidad:</h6>
+						<select name="gender" id="localidad" class="selectpicker" data-title="Select Gender" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+		         	 	  {% for codigo,nombre in oficinas %}
+		          		      <option value="{{ codigo }}">{{ nombre }}</option>
+    			  		  {% endfor %}
+    					</select>
+					</div>
+			
+				</div>
+				<div class="col-md-4 justify-content-center">
+					<div>
+						<label><h6>Cobrar TASA a propietario:</h6></label>
+						<input id="tasa_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" >
+					</div>
+					<div>
+						<label><h6>Cobrar AGUA a propietario:</h6></label>
+						<input id="agua_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" >
+					</div>
+					<div>
+						<label><h6>Cobrar API a propietario:</h6></label>
+						<input id="api_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" >
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<button type="button" class="btn btn-primary" v-on:click="setFecha()">Guardar</button>
+			</div>
+			
+			
+			
+						
+			
+			
 		</div>
 
 		<!-- FORMULARIO MONTOS -->
@@ -264,8 +308,11 @@
 			monto: {primero: 0.00, segundo: 0.00},
 			listado_propiedades: [],
 			listado_inquilinos: [],
-			anios_contrato: 2,
-			oficinas: '{{oficinas|escapejs}}'
+			anios_contrato: 3,
+			oficina: "SAFE",
+			cobrar_tasa_propietario: false,
+			cobrar_agua_propietario: false,
+			cobrar_api_propietariooo: false
 		},
 		created: function() {
 			function getQueryStringValue (key) {
@@ -346,6 +393,15 @@
 				//anios_contrato=$('#form_anio_duracion_contrato').val();
 				//simulamos cuando seria la fecha final del contrato
 				this.detalles.fecha_fin = addAnios(this.detalles.fecha_inicio, this.anios_contrato);
+				//guardamos la oficina seleccionada
+				var select = document.getElementById("localidad");
+				var opcionSeleccionada= select.options[select.selectedIndex];
+				this.oficina= opcionSeleccionada.value;
+				//guardamos las selecciones
+				this.cobrar_tasa_propietario= document.getElementById("tasa_a_propietario").checked;
+				this.cobrar_agua_propietario= document.getElementById("agua_a_propietario").checked;
+				this.cobrar_api_propietariooo= document.getElementById("api_a_propietario").checked;
+
 			},
 			setMonto: function(){
 				var valor_monto = parseFloat($('#form_monto_1').val().replace(',', '.'));
