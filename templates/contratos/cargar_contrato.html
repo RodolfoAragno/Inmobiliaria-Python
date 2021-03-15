@@ -212,7 +212,7 @@
 				<h4 class="mb-3">Detalles</h4>
 			</div>
 			
-			<div class= "row text-center  ">
+			<div class= "row text-left  ">
 				<div class="col-md-4 justify-content-center">
 					
 					<h6>Fecha de inicio del contrato</h6>
@@ -224,7 +224,7 @@
 						data-date-format="yyyy/mm/dd" 
 						id="form_detalles_inicio"></div>
 				</div>
-				<div class="col-md-4 justify-content-center">
+				<div class="col-md-4 justify-content-left">
 						
 				<!--tomamos la cantidad de años de duracion del contrato para calcular su fecha de vencimiento-->
 					<div>
@@ -233,8 +233,8 @@
 					</div>
 				<!--Ingresamos las localidades-->
 					<div>
-						<h6>Localidad:</h6>
-						<select name="gender" id="localidad" class="selectpicker" data-title="Select Gender" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+						<h6>Oficina:</h6>
+						<select name="gender" id="localidad" class="selectpicker form-select" data-title="Seleccion oficina" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
 		         	 	  {% for codigo,nombre in oficinas %}
 		          		      <option value="{{ codigo }}">{{ nombre }}</option>
     			  		  {% endfor %}
@@ -242,7 +242,7 @@
 					</div>
 			
 				</div>
-				<div class="col-md-4 justify-content-center">
+				<div class="col-md-4 justify-content-left">
 					<div>
 						<label><h6>Cobrar TASA a propietario:</h6></label>
 						<input id="tasa_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" >

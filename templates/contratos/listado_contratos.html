@@ -11,23 +11,24 @@
                     <button type="button" class="btn btn-info">Cargar nuevo contrato</button>
                 </a>
             </div>
-            <div class="col-md-3">
-                <form>
+            <div class="col-md-6">
+                <!--<form>-->
                 
-                    <select name="gender" class="selectpicker" data-title="Select Gender" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+                    
+                
+                    <div class="form-group row">
+                        <label for="busquedaContratos" class="col-form-label">Búsqueda:</label>
+                        <div class="col-md-6">
+                            <input type="text" id="busquedaContratos" class="form-control" onkeyup="busquedaFunction()" placeholder="Ingresar dirección o apellidos"
+                                autofocus>
+                        </div>
+                        <select id="busquedaOficina" name="oficina" class="selectpicker col-md-4" data-title="Oficina" data-style="btn-default btn-block form-control" data-menu-style="dropdown-blue" onchange="busquedaFunction()	">
 		                {% for codigo,nombre in oficinas %}
 		                    <option value="{{ codigo }}">{{ nombre }}</option>
     			        {% endfor %}
     			    </select>
-                
-                    <div class="form-group row">
-                        <label for="busquedaContratos" class="col-form-label">Búsqueda:</label>
-                        <div class="col-sm-10">
-                            <input type="text" id="busquedaContratos" class="form-control" onkeyup="busquedaFunction()" placeholder="Ingresar dirección o apellidos"
-                                autofocus>
-                        </div>
                     </div>
-                </form>
+                <!--</form>-->
             </div>
         </div>
         
@@ -69,6 +70,8 @@
         var input, filter, table, tr, td, i, oficina;
         input = document.getElementById("busquedaContratos");
         filter = input.value.toLowerCase();
+        input_oficina = document.getElementById("busquedaOficina");
+        filter_oficina = input_oficina.value;
         table = document.getElementById("tablaContratos");
         tr = table.getElementsByTagName("tr");
         for (i = 1; i < tr.length; i++) {
@@ -76,7 +79,7 @@
                 tr[i].getElementsByTagName("td")[1].innerHTML.toLowerCase() + ' ' + tr[i].getElementsByTagName("td")[2].innerHTML.toLowerCase();
             oficina = tr[i].getElementsByTagName("td")[4].innerHTML
             if (td) {
-                if (td.indexOf(filter) > -1 && oficina.indexOf('ROSA') > -1) {
+                if (td.indexOf(filter) > -1 && oficina.indexOf(filter_oficina) > -1) {
                     tr[i].style.display = "";
                 } else {
                     tr[i].style.display = "none";
