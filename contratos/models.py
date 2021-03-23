@@ -42,6 +42,8 @@ class Contrato(models.Model):
 	cobrar_tasa_propietario = models.BooleanField(default=False)
 	cobrar_agua_propietario = models.BooleanField(default=False)
 	cobrar_api_propietariooo = models.BooleanField(default=False)
+	cobrar_expensas_propietario = models.BooleanField(default=False)
+	cobrar_expensas_ext_propietario = models.BooleanField(default=True)
 	
 	def save(self, *args, **kwargs):
 		parametros = Parametros.cargar()
@@ -235,9 +237,61 @@ class MesContrato(models.Model):
 				'monto': vario.monto
 			})
 		return grilla_mes
-	
-	def getDetallePropietario(self):
+	def __getDetalles(self,propietario):
 		detalles = []
+
+		if propietario:
+			detalles.append({
+				'descripcion': 'Monto mensual fijo {}'.format(format_date(self.fecha_vencimiento, format='MMMM yyyy',locale='es')),
+				'valor': self.monto_propietario
+			})
+		else:
+			detalles.append({
+				'descripcion': 'Monto mensual fijo {}'.format(format_date(self.fecha_vencimiento, format='MMMM yyyy',locale='es')),
+				'valor': self.monto
+			})
+
+		if self.tasa != None and self.tasa > 0 and propietario == self.contrato.cobrar_tasa_propietario:
+			detalles.append({
+				'descripcion': 'Tasa {}'.format(format_date(self.fecha_vencimiento, format='MMMM yyyy',locale='es')),
+				'valor': self.tasa if not propietario else -self.tasa
+			})
+		if self.agua != None and self.agua > 0 and propietario == self.contrato.cobrar_agua_propietario:
+			detalles.append({
+				'descripcion': 'Agua {}'.format(format_date(self.fecha_vencimiento, format='MMMM yyyy',locale='es')),
+				'valor': self.agua if not propietario else -self.agua
+			})
+		if self.api != None and self.api > 0 and propietario == self.contrato.cobrar_api_propietariooo:
+			detalles.append({
+				'descripcion': 'API {}'.format(format_date(self.fecha_vencimiento, format='MMMM yyyy',locale='es')),
+				'valor': self.api if not propietario else -self.api
+			})
+		if self.expensas != None and self.expensas > 0 and propietario == self.contrato.cobrar_expensas_propietario:
+			detalles.append({
+				'descripcion': 'Expensas {}'.format(format_date(self.fecha_vencimiento - relativedelta(months=1), format='MMMM yyyy',locale='es')),
+				'valor': self.expensas if not propietario else -self.expensas
+			})
+		if self.expensas_ext != None and self.expensas_ext > 0 and propietario == self.contrato.cobrar_expensas_ext_propietario:
+			detalles.append({
+				'descripcion': 'Expensas Extraordinarias {}'.format(format_date(self.fecha_vencimiento - relativedelta(months=1), format='MMMM yyyy',locale='es')),
+				'valor': self.expensas_ext if not propietario else -self.expensas_ext
+			})
+		if self.intereses != None and self.intereses > 0 and not propietario:
+			detalles.append({
+				'descripcion': 'Intereses',
+				'valor': self.intereses
+			})
+		varios = ConceptoVario.objects.filter(mes=self, para_propietario= propietario).all()
+		for vario in varios:
+			detalles.append({
+				'descripcion': vario.descripcion,
+				'valor': vario.monto
+			})
+		
+		return detalles
+
+	def getDetallePropietario(self):
+		"""detalles = []
 		detalles.append({
 			'descripcion': 'Monto mensual fijo {}'.format(format_date(self.fecha_vencimiento, format='MMMM yyyy',locale='es')),
 			'valor': self.monto_propietario
@@ -248,10 +302,11 @@ class MesContrato(models.Model):
 				'descripcion': vario.descripcion,
 				'valor': vario.monto
 			})
-		return detalles
+		return detalles"""
+		return self.__getDetalles(True)
 	
 	def getDetalle(self):
-		detalles = []
+		"""detalles = []
 		detalles.append({
 			'descripcion': 'Monto mensual fijo {}'.format(format_date(self.fecha_vencimiento, format='MMMM yyyy',locale='es')),
 			'valor': self.monto
@@ -287,10 +342,35 @@ class MesContrato(models.Model):
 				'descripcion': vario.descripcion,
 				'valor': vario.monto
 			})
-		return detalles
+		return detalles"""
+		return self.__getDetalles(False)
+
+	def __total(self, conIntereses=True, propietario=False):
+		total=0
+		if propietario:
+			total = self.monto_propietario
+		else:
+			total = self.monto
+		if self.api is not None and propietario == self.contrato.cobrar_api_propietariooo:
+			total += self.api if not propietario else -self.api
+		if self.expensas is not None and propietario == self.contrato.cobrar_expensas_propietario:
+			total += self.expensas if not propietario else -self.expensas
+			
+		if self.expensas_ext is not None and propietario == self.contrato.cobrar_expensas_ext_propietario:
+			total += self.expensas_ext if not propietario else -self.expensas_ext
+		if self.agua is not None and propietario == self.contrato.cobrar_agua_propietario:
+			total += self.agua if not propietario else -self.agua
+		if self.tasa is not None and propietario == self.contrato.cobrar_tasa_propietario:
+			total += self.tasa if not propietario else -self.tasa
+		if self.intereses is not None and conIntereses and not propietario:
+			total += self.intereses
+		varios = ConceptoVario.objects.filter(mes=self, para_propietario=propietario).all()
+		for vario in varios:
+			total += vario.monto
+		return total
 	
 	def totalACobrar(self, conIntereses=True):
-		total = self.monto
+		"""total = self.monto
 		if self.api is not None:
 			total += self.api
 		if self.expensas is not None:
@@ -304,14 +384,16 @@ class MesContrato(models.Model):
 		varios_inquilino = ConceptoVario.objects.filter(mes=self, para_propietario=False).all()
 		for vario in varios_inquilino:
 			total += vario.monto
-		return total
+		return total"""
+		return self.__total(conIntereses,False)
 
 	def totalAPagar(self):
-		total = self.monto_propietario
+		"""total = self.monto_propietario
 		varios_propietario = ConceptoVario.objects.filter(mes=self, para_propietario=True).all()
 		for vario in varios_propietario:
 			total += vario.monto
-		return total
+		return total"""
+		return self.__total(False, True)
 
 	def calcular_intereses(self):
 		parametros = Parametros.cargar()
