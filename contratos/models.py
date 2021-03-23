@@ -210,6 +210,7 @@ class MesContrato(models.Model):
 			'agua': convertir_a_float(self.agua),
 			'api': convertir_a_float(self.api),
 			'expensas': convertir_a_float(self.expensas),
+			'expensas_ext': convertir_a_float(self.expensas_ext),
 			'intereses': convertir_a_float(self.intereses),
 			'varios_inquilino': [],
 			'varios_propietario': [],

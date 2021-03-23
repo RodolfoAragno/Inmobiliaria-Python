@@ -26,7 +26,7 @@
 				<th>AGUA</th>
 				<th>API</th>
 				<th>EXPENSAS</th>
-				<th>VARIOS</th>
+				<th style="font-size: 12px;">EXPENSAS <br> EXTRAORDINARIAS</th>
 				<th>INTERESES</th>
 				<th>COBROS</th>
 				<th>PAGOS</th>
@@ -76,9 +76,11 @@
 					<i data-feather="plus"></i>
 				</button>
 			</td>
-			<td>
-				$[[ monedaATexto(totalVarios(mes)) ]]
-				
+			<td v-bind:class="{ 'bg-invalido': mes.expensas_ext == null && !mes.pagado_inquilino}">
+				$[[ monedaATexto(mes.expensas_ext) ]]
+				<button class="btn btn-link btn-sm" v-on:click="cambiaCelda(index, 7)" v-if="!mes.pagado_inquilino">
+					<i data-feather="plus"></i>
+				</button>
 			</td>
 			<td>$[[ monedaATexto(mes.intereses) ]]</td>
 			<td v-bind:class="{ 'bg-pagado': mes.pagado_inquilino, 'bg-no-pagado': mes.intereses > 0 && !mes.pagado_inquilino }">
@@ -130,7 +132,7 @@
 				return total;
 			},
 			totalAPagar: function(mes) {
-				return this.monedaATexto(mes.inquilino + mes.tasa + mes.agua + mes.api + mes.expensas + mes.intereses + this.totalVarios(mes))
+				return this.monedaATexto(mes.inquilino + mes.tasa + mes.agua + mes.api + mes.expensas + mes.expensas_ext + mes.intereses + this.totalVarios(mes))
 			},
 			totalPropietario: function(mes) {
 				var total = mes.propietario;
@@ -305,9 +307,9 @@
 				});
 			},
 			cambiaCelda: function(i, j) {
-				//if(i < 0 || i > 24 || j < 3 || j > 6) return;
+				//if(i < 0 || i > 24 || j < 3 || j > 7) return;
 				var msg = ''
-				var impuestos = ['tasa', 'agua', 'api', 'expensas']
+				var impuestos = ['tasa', 'agua', 'api', 'expensas', 'expensas_ext']
 				var impuesto_actual = impuestos[j-3]
 				msg = impuesto_actual.toLocaleUpperCase() + ' - ' + this.dataGrilla[i].mes
 				var valor_actual = this.monedaATexto(this.dataGrilla[i][impuesto_actual])

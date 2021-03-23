@@ -67,6 +67,8 @@ def modificar_mes(request):
 				mes.api = nuevo_valor
 			elif impuesto == 'expensas':
 				mes.expensas = nuevo_valor
+			elif impuesto == 'expensas_ext':
+				mes.expensas_ext = nuevo_valor
 			mes.save()
 		return JsonResponse(mes.a_diccionario())
 
