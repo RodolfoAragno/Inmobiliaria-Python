@@ -245,15 +245,39 @@
 				<div class="col-md-4 justify-content-left">
 					<div>
 						<label><h6>Cobrar TASA a propietario:</h6></label>
-						<input id="tasa_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" >
+						<div class="float-right">
+							<input id="tasa_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small">	
+						</div>
+						
 					</div>
 					<div>
 						<label><h6>Cobrar AGUA a propietario:</h6></label>
-						<input id="agua_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" >
+						<div class="float-right">
+							<input id="agua_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" >
+
+						</div>
+						
 					</div>
 					<div>
 						<label><h6>Cobrar API a propietario:</h6></label>
-						<input id="api_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" >
+						<div class="float-right">
+							<input id="api_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" >	
+						</div>
+						
+					</div>
+					<div>
+						<label><h6>Cobrar EXPENSAS a propietario:</h6></label>
+						<div class="float-right">
+							<input id="expensas_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" >	
+						</div>
+						
+					</div>
+					<div>
+						<label><h6>Cobrar EXPENSAS EXTRAORDINARIAS a propietario:</h6></label>
+						<div class="float-right">
+							<input id="expensas_ext_a_propietario" type="checkbox"  data-toggle="toggle" data-on="SI" data-off="NO" data-size="small" checked >	
+						</div>
+						
 					</div>
 				</div>
 			</div>
@@ -312,7 +336,9 @@
 			oficina: "SAFE",
 			cobrar_tasa_propietario: false,
 			cobrar_agua_propietario: false,
-			cobrar_api_propietariooo: false
+			cobrar_api_propietariooo: false,
+			cobrar_expensas_propietario: false,
+			cobrar_expensas_ext_propietario: true
 		},
 		created: function() {
 			function getQueryStringValue (key) {
@@ -401,6 +427,8 @@
 				this.cobrar_tasa_propietario= document.getElementById("tasa_a_propietario").checked;
 				this.cobrar_agua_propietario= document.getElementById("agua_a_propietario").checked;
 				this.cobrar_api_propietariooo= document.getElementById("api_a_propietario").checked;
+				this.cobrar_expensas_propietario = document.getElementById("expensas_a_propietario").checked;
+				this.cobrar_expensas_ext_propietario = document.getElementById("expensas_ext_a_propietario").checked;
 
 			},
 			setMonto: function(){
