@@ -22,11 +22,26 @@
 				<th>MES</th>
 				<th>INQUILINO</th>
 				<th>PROPIETARIO</th>
-				<th>TASA</th>
-				<th>AGUA</th>
-				<th>API</th>
-				<th>EXPENSAS</th>
-				<th style="font-size: 12px;">EXPENSAS <br> EXTRAORDINARIAS</th>
+				<th>{% if contrato.cobrar_tasa_propietario %} 
+					<span style="font-size: 8px;">propietario<br/></span> 
+					{% endif %}
+				TASA </th>
+				<th>{% if contrato.cobrar_agua_propietario %} 
+					<span style="font-size: 8px;">propietario<br/></span> 
+					{% endif %}
+				AGUA</th>
+				<th>{% if contrato.cobrar_api_propietariooo %} 
+					<span style="font-size: 8px;">propietario<br/></span> 
+					{% endif %}
+				API</th>
+				<th>{% if contrato.cobrar_expensas_propietario %} 
+					<span style="font-size: 8px;">propietario<br/></span> 
+					{% endif %}
+				EXPENSAS</th>
+				<th>{% if contrato.cobrar_expensas_ext_propietario %} 
+					<span style="font-size: 8px;">propietario<br/></span> 
+					{% endif %}
+				EXP. EXT.</th>
 				<th>INTERESES</th>
 				<th>COBROS</th>
 				<th>PAGOS</th>
@@ -132,14 +147,15 @@
 				return total;
 			},
 			totalAPagar: function(mes) {
-				return this.monedaATexto(mes.inquilino + mes.tasa + mes.agua + mes.api + mes.expensas + mes.expensas_ext + mes.intereses + this.totalVarios(mes))
+				return this.monedaATexto(parseFloat(mes.total_inquilino))
 			},
 			totalPropietario: function(mes) {
+				/*
 				var total = mes.propietario;
 				for (var i = 0, len = mes.varios_propietario.length; i < len; i++) {
 					total += parseFloat(mes.varios_propietario[i].monto);
-				}
-				return this.monedaATexto(total);
+				}*/
+				return this.monedaATexto(parseFloat(mes.total_propietario));
 			},
 			puedePagar: function(index, mes) {
 				if(mes.tasa != null && mes.agua != null && mes.api != null && mes.expensas != null){

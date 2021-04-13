@@ -217,7 +217,9 @@ class MesContrato(models.Model):
 			'varios_inquilino': [],
 			'varios_propietario': [],
 			'pagado_inquilino': pagado_inquilino,
-			'pagado_propietario': pagado_propietario
+			'pagado_propietario': pagado_propietario,
+			'total_inquilino': self.totalACobrar(True),
+			'total_propietario': self.totalAPagar()
 		}
 		hoy = date.today()
 		if not pagado_inquilino and self.fecha_vencimiento <= hoy:
@@ -354,8 +356,7 @@ class MesContrato(models.Model):
 		if self.api is not None and propietario == self.contrato.cobrar_api_propietariooo:
 			total += self.api if not propietario else -self.api
 		if self.expensas is not None and propietario == self.contrato.cobrar_expensas_propietario:
-			total += self.expensas if not propietario else -self.expensas
-			
+			total += self.expensas if not propietario else -self.expensas			
 		if self.expensas_ext is not None and propietario == self.contrato.cobrar_expensas_ext_propietario:
 			total += self.expensas_ext if not propietario else -self.expensas_ext
 		if self.agua is not None and propietario == self.contrato.cobrar_agua_propietario:
@@ -364,6 +365,7 @@ class MesContrato(models.Model):
 			total += self.tasa if not propietario else -self.tasa
 		if self.intereses is not None and conIntereses and not propietario:
 			total += self.intereses
+
 		varios = ConceptoVario.objects.filter(mes=self, para_propietario=propietario).all()
 		for vario in varios:
 			total += vario.monto

@@ -108,6 +108,12 @@ def cargar_contrato(request):
 		contrato.inquilino = Inquilino.objects.get(persona__dni=datos['dni_inquilino'])
 		contrato.fecha_inicio = date.fromtimestamp(int(datos['fecha_inicio']) / 1000);
 		contrato.monto_primer_anio = datos['monto']
+		contrato.cobrar_tasa_propietario = datos['cobrar_tasa_propietario']
+		contrato.cobrar_agua_propietario = datos['cobrar_agua_propietario']
+		contrato.cobrar_api_propietariooo = datos['cobrar_api_propietariooo']
+		contrato.cobrar_expensas_propietario = datos['cobrar_expensas_propietario']
+		contrato.cobrar_expensas_ext_propietario = datos['cobrar_expensas_ext_propietario']
+		contrato.oficina = datos['oficina']
 		contrato.save()
 		print(datos['anios_contrato'])
 		contrato.generar_meses(int(datos['anios_contrato']))
