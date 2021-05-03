@@ -229,12 +229,12 @@
 				<!--tomamos la cantidad de años de duracion del contrato para calcular su fecha de vencimiento-->
 					<div>
 						<h6>Cantidad de años de duración del contrato:</h6>
-						<input type="number" class="form-control" id="form_anio_duracion_contrato" >
+						<input type="number" class="form-control" id="form_anio_duracion_contrato" required value='3' >
 					</div>
 				<!--Ingresamos las localidades-->
 					<div>
 						<h6>Oficina:</h6>
-						<select name="gender" id="localidad" class="selectpicker form-select" data-title="Seleccion oficina" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+						<select name="gender" id="localidad" class="selectpicker form-control" data-title="Seleccion oficina" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
 		         	 	  {% for codigo,nombre in oficinas %}
 		          		      <option value="{{ codigo }}">{{ nombre }}</option>
     			  		  {% endfor %}
