@@ -25,6 +25,7 @@ class Contrato(models.Model):
         ('ROSA', 'Rosario'),
         ('RECO', 'Reconquista'),
         ]
+	
         
         
 	inquilino = models.ForeignKey(Inquilino, on_delete=models.DO_NOTHING, related_name="contratos")
@@ -157,6 +158,7 @@ class Contrato(models.Model):
 		document.write(save_path)
 		print(save_path)
 		return
+
 
 def convertir_a_float(num):
 	if num is None:
@@ -397,6 +399,9 @@ class MesContrato(models.Model):
 		return total"""
 		return self.__total(False, True)
 
+	def getOficina(self):
+		return dict(self.contrato.OFICINAS)[self.contrato.oficina]
+
 	def calcular_intereses(self):
 		parametros = Parametros.cargar()
 		pagado_inquilino = self.fecha_pagado_inquilino is not None
@@ -424,3 +429,4 @@ class ConceptoVario(models.Model):
 		except:
 			if self.id is not None:
 				self.delete()
+
