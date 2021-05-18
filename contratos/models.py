@@ -46,6 +46,10 @@ class Contrato(models.Model):
 	cobrar_expensas_propietario = models.BooleanField(default=False)
 	cobrar_expensas_ext_propietario = models.BooleanField(default=True)
 	
+	sellado = models.DecimalField(max_digits=12, decimal_places=2)
+	comision = models.DecimalField(max_digits=12, decimal_places=2)
+	cuotas_comision = models.IntegerField()
+
 	def save(self, *args, **kwargs):
 		parametros = Parametros.cargar()
 		# calcula fecha_fin y fecha_mitad:
@@ -94,6 +98,7 @@ class Contrato(models.Model):
 	def generar_meses(self, anios):
 		#generar el poder a travez de la propiedad
 		aux_fecha_vencimiento = datetime(self.fecha_inicio.year, self.fecha_inicio.month, 10)
+		aux_cuotas = 0
 		print(self.monto_primer_anio)
 		print(anios)
 		#convertir el dia de vencimiento en parametro
@@ -105,6 +110,21 @@ class Contrato(models.Model):
 			mes.monto = self.monto_primer_anio
 			mes.save(creando=True)
 			aux_fecha_vencimiento += relativedelta(months = 1)
+			if self.comision > 0.12 and aux_cuotas < self.cuotas_comision:
+				c = ConceptoVario()
+				c.mes = mes
+				c.monto = self.comision / self.cuotas_comision
+				c.descripcion = 'Cuota comision (' + aux_cuotas + ')'
+				c.no_editable = True
+				c.save()
+			if self.sellado > 0.01 and aux_cuotas == 0 :
+				c = ConceptoVario()
+				c.mes = mes
+				c.monto = self.sellado
+				c.descricion = 'Sellado'
+				c.no_editable = True
+				c.save()
+			aux_cuotas += 1
 		'''
 		for _ in range(12):
 			mes = MesContrato()
@@ -420,7 +440,8 @@ class ConceptoVario(models.Model):
 	monto = models.DecimalField(max_digits=12, decimal_places=2)
 	a_favor = models.BooleanField(default=False)
 	para_propietario = models.BooleanField(default=False)
-
+	no_editable = models.BooleanField(default=False)
+	
 	mes = models.ForeignKey(MesContrato, on_delete=models.DO_NOTHING, related_name='varios')
 
 	def save(self, *args, **kwargs):
