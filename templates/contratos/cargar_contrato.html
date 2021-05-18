@@ -292,20 +292,39 @@
 			
 		</div>
 
+		
 		<!-- FORMULARIO MONTOS -->
 		<div class="col-md-8 order-md-1 formulario" id="formulario_montos" style="display: none">
 			<h4 class="mb-3">Montos</h4>
-			<h6>Monto a pagar durante el primer año:</h6>
+			
 			<div class="row">
-				<div class="col-md-5"><input type="text" class="form-control" id="form_monto_1" v-on:keyup.enter="setMonto"></div>
-				<div class="col-auto"><button type="button" class="btn btn-primary" v-on:click="setMonto">Guardar</button></div>
+				
+				<div class="col-md-5">
+					<h6>Monto a pagar durante el primer año:</h6>
+					<input type="text" class="form-control" id="form_monto_1" v-on:keyup.enter="setMonto">
+					<ul>
+						<li>Comisión correspondiente a la inmobiliaria: {{ texto_porcentaje }}%.</li>
+					</ul>
+			
+				</div>
+				
 			</div>
 			<!--<small>El monto a pagar del segundo año se calcula automáticamente.</small><br>-->
-			<ul>
-				<!--<li>Incremento anual: {{ texto_incremento }}%.</li>-->
-				
-				<li>Comisión correspondiente a la inmobiliaria: {{ texto_porcentaje }}%.</li>
-			</ul>
+			
+			<div class="row">
+				<div class="col-md-5"><h6>Sellado</h6><input type="text" class="form-control" id="form_sellado" v-on:keyup.enter="setMonto"></div>
+			</div>
+			
+			<div class="row">
+				<div class="col-md-5"><h6>Comisión</h6><input type="text" class="form-control" id="form_comision" v-on:keyup.enter="setMonto"></div>
+			</div>
+			
+			<div class="row">
+				<div class="col-md-5"><h6>Cantidad de cuotas</h6><input type="number" class="form-control" id="form_cuotas" v-on:keyup.enter="setMonto"></div>
+			</div>
+			<div class="row">
+				<div class="col-auto"><button type="button" class="btn btn-primary" v-on:click="setMonto">Guardar</button></div>
+			</div>
 		</div>
 	</div>
 	<!-- Los formularios van arriba de este /div -->
@@ -338,7 +357,10 @@
 			cobrar_agua_propietario: false,
 			cobrar_api_propietariooo: false,
 			cobrar_expensas_propietario: false,
-			cobrar_expensas_ext_propietario: true
+			cobrar_expensas_ext_propietario: true,
+			sellado: 0.0,
+			comision: 0.0,
+			cuotas_comision: 1
 		},
 		created: function() {
 			function getQueryStringValue (key) {
@@ -443,6 +465,9 @@
 					this.monto.primero = 0.00;
 					this.monto.segundo = 0.00;
 				}
+				this.sellado = parseFloat($('#form_sellado').val().replace(',', '.'));
+				this.comision = parseFloat($('#form_comision').val().replace(',', '.'));
+				this.cuotas_comision = parseInt($('#form_cuotas').val());
 			},
 			quitarPropiedad: function() {
 				this.propiedad = {direccion: 'NO SELECCIONADA', nombre_propietario: 'NO SELECCIONADO'}
@@ -481,7 +506,11 @@
 						cobrar_agua_propietario: this.cobrar_agua_propietario,
 						cobrar_api_propietariooo: this.cobrar_api_propietariooo,
 						cobrar_expensas_propietario: this.cobrar_expensas_propietario,
-						cobrar_expensas_ext_propietario: this.cobrar_expensas_ext_propietario
+						cobrar_expensas_ext_propietario: this.cobrar_expensas_ext_propietario,
+						sellado: this.sellado,
+						comision: this.comision,
+						cuotas_comision: this.cuotas_comision
+
 					})
 				)
 				aviso_de_salida = false;

@@ -114,6 +114,9 @@ def cargar_contrato(request):
 		contrato.cobrar_expensas_propietario = datos['cobrar_expensas_propietario']
 		contrato.cobrar_expensas_ext_propietario = datos['cobrar_expensas_ext_propietario']
 		contrato.oficina = datos['oficina']
+		contrato.sellado = datos['sellado']
+		contrato.comision = datos['comision']
+		contrato.cuotas_comision = datos['cuotas_comision']
 		contrato.save()
 		print(datos['anios_contrato'])
 		contrato.generar_meses(int(datos['anios_contrato']))

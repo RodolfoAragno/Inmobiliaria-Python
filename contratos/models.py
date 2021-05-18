@@ -46,9 +46,9 @@ class Contrato(models.Model):
 	cobrar_expensas_propietario = models.BooleanField(default=False)
 	cobrar_expensas_ext_propietario = models.BooleanField(default=True)
 	
-	sellado = models.DecimalField(max_digits=12, decimal_places=2)
-	comision = models.DecimalField(max_digits=12, decimal_places=2)
-	cuotas_comision = models.IntegerField()
+	sellado = models.DecimalField(max_digits=12, decimal_places=2,default=0)
+	comision = models.DecimalField(max_digits=12, decimal_places=2,default=0)
+	cuotas_comision = models.IntegerField(default=1)
 
 	def save(self, *args, **kwargs):
 		parametros = Parametros.cargar()
@@ -114,14 +114,14 @@ class Contrato(models.Model):
 				c = ConceptoVario()
 				c.mes = mes
 				c.monto = self.comision / self.cuotas_comision
-				c.descripcion = 'Cuota comision (' + aux_cuotas + ')'
+				c.descripcion = 'Cuota comision (' + str(aux_cuotas + 1) + ')'
 				c.no_editable = True
 				c.save()
 			if self.sellado > 0.01 and aux_cuotas == 0 :
 				c = ConceptoVario()
 				c.mes = mes
 				c.monto = self.sellado
-				c.descricion = 'Sellado'
+				c.descripcion = 'Sellado'
 				c.no_editable = True
 				c.save()
 			aux_cuotas += 1
