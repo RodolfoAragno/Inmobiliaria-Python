@@ -295,36 +295,36 @@
 		
 		<!-- FORMULARIO MONTOS -->
 		<div class="col-md-8 order-md-1 formulario" id="formulario_montos" style="display: none">
-			<h4 class="mb-3">Montos</h4>
+			
+			<div class="row justify-content-center">
+				<h4 class="mb-3">Montos</h4>
+			</div>
 			
 			<div class="row">
 				
-				<div class="col-md-5">
+				<div class="col-md-6">
 					<h6>Monto a pagar durante el primer año:</h6>
 					<input type="text" class="form-control" id="form_monto_1" v-on:keyup.enter="setMonto">
-					<ul>
-						<li>Comisión correspondiente a la inmobiliaria: {{ texto_porcentaje }}%.</li>
-					</ul>
+					
+					<div class="span font-italic">- Comisión correspondiente a la inmobiliaria: {{ texto_porcentaje }}%.</div>
+					
+
+					<h6>Sellado:</h6><input type="text" class="form-control" id="form_sellado" v-on:keyup.enter="setMonto">
 			
+				</div>
+				<div class="col-md-6">
+					<h6>Comisión:</h6><input type="text" class="form-control" id="form_comision" v-on:keyup.enter="setMonto">
+					<br>
+					<h6>Cantidad de cuotas:</h6><input type="number" class="form-control" id="form_cuotas" v-on:keyup.enter="setMonto">
 				</div>
 				
 			</div>
-			<!--<small>El monto a pagar del segundo año se calcula automáticamente.</small><br>-->
+				<br>
+			<div class="row justify-content-center">
 			
-			<div class="row">
-				<div class="col-md-5"><h6>Sellado</h6><input type="text" class="form-control" id="form_sellado" v-on:keyup.enter="setMonto"></div>
-			</div>
-			
-			<div class="row">
-				<div class="col-md-5"><h6>Comisión</h6><input type="text" class="form-control" id="form_comision" v-on:keyup.enter="setMonto"></div>
+				<button type="button" class="btn btn-primary" v-on:click="setMonto">Guardar</button>
 			</div>
 			
-			<div class="row">
-				<div class="col-md-5"><h6>Cantidad de cuotas</h6><input type="number" class="form-control" id="form_cuotas" v-on:keyup.enter="setMonto"></div>
-			</div>
-			<div class="row">
-				<div class="col-auto"><button type="button" class="btn btn-primary" v-on:click="setMonto">Guardar</button></div>
-			</div>
 		</div>
 	</div>
 	<!-- Los formularios van arriba de este /div -->
