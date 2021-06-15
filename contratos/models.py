@@ -114,7 +114,7 @@ class Contrato(models.Model):
 				c = ConceptoVario()
 				c.mes = mes
 				c.monto = self.comision / self.cuotas_comision
-				c.descripcion = 'Cuota comision (' + str(aux_cuotas + 1) + ')'
+				c.descripcion = 'Cuota comision (' + str(aux_cuotas + 1) + ' de '+ str(self.cuotas_comision)  + ')'
 				c.no_editable = True
 				c.save()
 			if self.sellado > 0.01 and aux_cuotas == 0 :
