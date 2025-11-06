@@ -54,7 +54,7 @@
 				<button class="btn btn-link btn-sm" v-on:click="variosInquilino(index)" v-if="!mes.pagado_inquilino">
 					<i data-feather="plus"></i>
 				</button>
-				<button class="btn btn-link btn-sm text-info" v-on:click="modificarMontoMeses(index)" v-if="!mes.pagado_inquilino && !mes.pagado_propietario && index % 12 == 0	">
+				<button class="btn btn-link btn-sm text-info" v-on:click="modificarMontoMeses(index)" v-if="!mes.pagado_inquilino && !mes.pagado_propietario">
 					<i data-feather="edit"></i>
 				</button>
 			
