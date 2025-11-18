@@ -89,14 +89,13 @@ def actualizar_monto(request):
 		id_mes = request.POST.get('id_mes')
 		mes = MesContrato.objects.get(pk=id_mes)
 		monto = request.POST.get('monto')
-		
-		for mes_a_editar in mes.contrato.meses.all():
-			if (mes_a_editar.id >= mes.id):
+		meses_a_editar = int(request.POST.get('meses_a_editar'))
+		meses_editados = 1
+		for mes_a_editar in mes.contrato.meses.all().order_by('id'):
+			if (mes_a_editar.id >= mes.id and mes_a_editar.id < mes.id + meses_a_editar):
 				mes_a_editar.monto = decimal.Decimal(monto).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
 				mes_a_editar.save(True)
-			
 		return JsonResponse(True, safe=False)# guardar mes que cambia
-	
 
 
 def propiedades(request):

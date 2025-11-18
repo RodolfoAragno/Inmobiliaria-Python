@@ -370,27 +370,57 @@
 				//if(valor_actual < "1") valor_actual = ""
 				bootbox.prompt({
 					title: msg,
-					inputType: 'text',
+					inputType: 'number',
 					value: 0,
 					callback: function(nuevoValor){
 						if(nuevoValor != null){
 							var val = app.textoAMoneda(nuevoValor)
 							//console.log('setting ' + i + ' imp: ' + impuesto_actual + ' to: ' + val)
 							//app.dataGrilla[i][impuesto_actual] = val
+							bootbox.prompt(
+								{
+									title: "Cuantos meses editar?",
+									inputType: "radio",
+									    inputOptions: [{
+											text: 'mes',
+											value: '1'
+										},
+										{
+											text: '2 meses',
+											value: '2'
+										},
+										{
+											text: '3 meses',
+											value: '3'
+										},
+										{
+											text: '6 meses',
+											value: '6'
+										},
+										{
+											text: '1 año',
+											value: '12'
+										}],
+									callback: function(meses_a_editar){
+										console.log(meses_a_editar);
+										var csrftoken = getCookie('csrftoken');
+										$.ajax({
+											method: "POST", 
+											url: "/ajax/actualizar_monto",
+											data: {
+												id_mes: app.dataGrilla[i].id_mes,
+												//impuesto: impuesto_actual,
+												monto: val,
+												meses_a_editar: meses_a_editar,
+												'csrfmiddlewaretoken': '{{ csrf_token }}'
+											}
+										}).done(function(respuesta) {
+											app.getMeses()
+										});
 
-							var csrftoken = getCookie('csrftoken');
-							$.ajax({
-								method: "POST",
-								url: "/ajax/actualizar_monto",
-								data: {
-									id_mes: app.dataGrilla[i].id_mes,
-									//impuesto: impuesto_actual,
-									monto: val,
-									'csrfmiddlewaretoken': '{{ csrf_token }}'
+									}
 								}
-							}).done(function(respuesta) {
-								app.getMeses()
-							});
+							)
 						}
 					}
 				});
